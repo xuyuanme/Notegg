@@ -11,7 +11,7 @@
 
 <script>
     var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
-
+    client.authDriver(new Dropbox.AuthDriver.Cordova());
     function doHelloWorld() {
         client.writeFile('notes.txt', 'Hello, World!', function (error) {
             if (error) {
