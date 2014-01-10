@@ -2,7 +2,7 @@
 
 
 // Declare app level module which depends on filters, and services
-angular.module('myApp', [
+var myApp = angular.module('myApp', [
         'ngRoute',
         'ngTouch',
         'myApp.filters',
@@ -16,3 +16,5 @@ angular.module('myApp', [
 
         $routeProvider.otherwise({redirectTo: '/view1'});
     }]);
+
+myApp.isPhone = document.URL.indexOf('http://') === -1 && document.URL.indexOf('https://') === -1;

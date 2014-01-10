@@ -3,6 +3,14 @@
 <head>
     <script type="text/javascript" src="cordova.js"></script>
     <script src="lib/dropbox/dropbox.min.js"></script>
+    <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular/angular-route.js"></script>
+    <script src="lib/angular/angular-touch.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/directives.js"></script>
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -12,7 +20,9 @@
 
 <script>
     var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
-    client.authDriver(new Dropbox.AuthDriver.Cordova());
+    if (myApp.isPhone) {
+        client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: false}));
+    }
     function doHelloWorld() {
         client.writeFile('notes.txt', 'Hello, World!', function (error) {
             if (error) {
@@ -28,7 +38,6 @@
             if (error) {
                 window.alert('Error: ' + error);
             } else {
-                window.alert('auth ok. now go with file writing');
                 doHelloWorld();
             }
         });
