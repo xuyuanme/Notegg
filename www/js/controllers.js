@@ -3,7 +3,8 @@
 /* Controllers */
 
 angular.module('myApp.controllers', [])
-    .controller('MyCtrl', ['$scope', '$location', 'DropBoxService', function ($scope, $location, DropBoxService) {
+    .controller('MyCtrl', ['$scope', '$location', 'DropBoxService', 'LogService', function ($scope, $location, DropBoxService, LogService) {
+
         $scope.goto = function (value) {
             $location.path(value);
             // window.alert($scope.actualWidth + ',' + $scope.actualHeight + ',' + $scope.screenWidth + ',' + $scope.screenHeight);
@@ -12,12 +13,12 @@ angular.module('myApp.controllers', [])
         $scope.authDropbox = function () {
             DropBoxService.authenticate(function (err, client) {
                 if (err) {
-                    console.log('err: ' + err);
+                    LogService.log('err: ' + err);
                     DropBoxService.reset();
                 } else {
-                    console.log('auth ok');
+                    LogService.log('auth ok');
                     $scope.readNotes();
-                    console.log('requested read notes');
+                    LogService.log('requested read notes');
                 }
             });
         };
@@ -26,11 +27,14 @@ angular.module('myApp.controllers', [])
             // $scope.notes = DropBoxService.readNotes();
             DropBoxService.readNotes().then(function (notes) {
                 $scope.notes = notes;
-                console.log('read notes done');
-            }, function (error) {
-                console.log('read notes promise get error: ' + error);
+                LogService.log('read notes done');
+            }, function (err) {
+                LogService.log('read notes promise get error: ' + err);
+                $scope.authDropbox();
             });
-        }
+        };
+
+        $scope.authDropbox();
     }])
     .controller('MyCtrl1', [function () {
 

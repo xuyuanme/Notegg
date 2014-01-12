@@ -7,8 +7,8 @@
 // In this case it is a simple value service.
 angular.module('myApp.services', [])
     .value('version', '0.1')
-    .factory('DropBoxService', function ($q) {
-        console.log('init dropbox client');
+    .factory('DropBoxService', function ($q, LogService) {
+        LogService.log('init dropbox client');
         var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
         if (myApp.isPhone) {
             client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: true}));
@@ -18,32 +18,31 @@ angular.module('myApp.services', [])
 
         var service = {
             authenticate: function (fn) {
-                console.log('start auth');
-                console.log(client._oauth._token);
+                LogService.log('start auth');
                 if (client._oauth._token === null) {
-                    console.log('auth token is null, client reset');
+                    LogService.log('auth token is null, client reset');
                     this.reset();
                 }
                 try {
                     client.authenticate(fn);
                 } catch (err) {
-                    console.log('catch err: ' + err);
+                    LogService.log('catch err: ' + err);
                     this.reset();
                 }
             },
             reset: function () {
-                console.log('client reset');
+                LogService.log('client reset');
                 client.reset();
             },
             readNotes: function () {
-                console.log('start read notes');
+                LogService.log('start read notes');
                 var defered = $q.defer();
                 client.readFile("notes.txt", function (err, data) {
                     if (err) {
-                        console.log('read notes err: ' + err);
+                        LogService.log('read notes err: ' + err);
                         defered.reject(err);
                     } else {
-                        console.log('read notes resolved');
+                        LogService.log('read notes resolved');
                         defered.resolve(data);
                     }
                 });
@@ -60,5 +59,13 @@ angular.module('myApp.services', [])
 //            }
         };
 
+        return service;
+    })
+    .factory('LogService', function () {
+        var service = {
+            log: function (log) {
+                console.log(log);
+            }
+        }
         return service;
     });
