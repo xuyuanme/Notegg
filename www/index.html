@@ -1,8 +1,14 @@
 <!doctype html>
-<html>
+<html ng-app="myApp">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <title>Notegg</title>
+
+    <script>document.write('<base href="' + document.location + '" />');</script>
     <script type="text/javascript" src="cordova.js"></script>
-    <script src="lib/dropbox/dropbox.min.js"></script>
+    <script src="lib/dropbox/dropbox.js"></script>
     <script src="lib/angular/angular.js"></script>
     <script src="lib/angular/angular-route.js"></script>
     <script src="lib/angular/angular-touch.js"></script>
@@ -14,34 +20,8 @@
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<div>
-    <button id="writeButton">Click to create <code>notes.txt</code> in Dropbox.</button>
-</div>
 
-<script>
-    var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
-    if (myApp.isPhone) {
-        client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: false}));
-    }
-    function doHelloWorld() {
-        client.writeFile('notes.txt', 'Hello, World!', function (error) {
-            if (error) {
-                window.alert('Error: ' + error);
-            } else {
-                window.alert('File written successfully!');
-            }
-        });
-    }
+<div ng-view></div>
 
-    document.getElementById('writeButton').onclick = function () {
-        client.authenticate(function (error, client) {
-            if (error) {
-                window.alert('Error: ' + error);
-            } else {
-                doHelloWorld();
-            }
-        });
-    }
-</script>
 </body>
 </html>

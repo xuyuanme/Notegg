@@ -10,11 +10,13 @@ var myApp = angular.module('myApp', [
         'myApp.directives',
         'myApp.controllers'
     ]).
-    config(['$routeProvider', function ($routeProvider) {
+    config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
+        $locationProvider.html5Mode(true).hashPrefix('!');
         $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
         $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl1'});
+        $routeProvider.when('/', {templateUrl: 'partials/main.html', controller: 'MyCtrl'});
 
-        $routeProvider.otherwise({redirectTo: '/view1'});
+        $routeProvider.otherwise({redirectTo: '/'});
     }]);
 
 myApp.isPhone = document.URL.indexOf('http://') === -1 && document.URL.indexOf('https://') === -1;
