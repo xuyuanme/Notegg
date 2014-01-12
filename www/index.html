@@ -6,7 +6,12 @@
 
     <title>Notegg</title>
 
-    <script>document.write('<base href="' + document.location + '" />');</script>
+    <script>
+        if (document.URL.indexOf('https://') !== -1 || document.URL.indexOf('http://') !== -1) {
+            // if not phonegap, set base url for html5mode
+            document.write('<base href="' + document.location + '" />');
+        }
+    </script>
     <script type="text/javascript" src="cordova.js"></script>
     <script src="lib/dropbox/dropbox.js"></script>
     <script src="lib/angular/angular.js"></script>
