@@ -1,6 +1,8 @@
-<div ng-class="{hidden:!showSigninButton}" ng-click="authDropbox()">Sign into Dropbox</div>
-<div ng-class="{hidden:!showWaitingBar}">Wait while retrieving data from Dropbox...</div>
-<textarea class="newline" ng-model="notes"></textarea>
-<div style="color: blue">{{ logs }}</div>
-<div ng-class="{hidden:!showSigninButton}" style="color: red">{{ errors }}</div>
-<div ng-class="{hidden:showWaitingBar||showSigninButton}" ng-click="writeNotes()">Commit</div>
+<div class="backgroundContainer">
+    <div ng-class="{hidden:!showSigninButton}" ng-click="authDropbox()">Sign into Dropbox</div>
+    <div ng-class="{hidden:!showWaitingBar}">Wait while retrieving data from Dropbox...</div>
+    <div style="color: blue">{{ logs }}</div>
+    <div ng-class="{hidden:!showSigninButton}" style="color: red">{{ errors }}</div>
+    <div ng-class="{hidden:showWaitingBar||showSigninButton}" ng-click="writeNotes()">Commit</div>
+    <textarea class="newline" ng-model="notes"></textarea>
+</div>
