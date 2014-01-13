@@ -41,3 +41,11 @@
   background-attachment: fixed;
   background-color: black;
 }
+
+.hidden {
+    display:none;
+}
+
+.newline {
+    white-space: pre;
+}
