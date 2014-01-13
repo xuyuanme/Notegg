@@ -52,7 +52,7 @@ angular.module('myApp.controllers', [])
 
         $scope.writeNotes = function () {
             $scope.log('start write notes');
-            DropBoxService.writeNotes('write test data').then(function () {
+            DropBoxService.writeNotes($scope.notes).then(function () {
                 $scope.log('write notes successful');
             }), function (err) {
                 $scope.error('write notes error: ' + err);
