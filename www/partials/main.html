@@ -1,3 +1,4 @@
-<div ng-click="authDropbox()">Tap to Refresh</div>
-<br>
-<div>{{ notes }}</div>
+<div ng-class="{hidden:!showSigninButton}" ng-click="authDropbox()">Sign into Dropbox</div>
+<div ng-class="{hidden:!showWaitingBar}">Wait while retrieving data from Dropbox...</div>
+<div class="newline">{{ notes }}</div>
+<div ng-class="{hidden:!showSigninButton}" style="color: red">{{ logs }}</div>

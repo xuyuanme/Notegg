@@ -7,8 +7,8 @@
 // In this case it is a simple value service.
 angular.module('myApp.services', [])
     .value('version', '0.1')
-    .factory('DropBoxService', function ($q, LogService) {
-        LogService.log('init dropbox client');
+    .factory('DropBoxService', function ($q) {
+        console.log('init dropbox client');
         var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
         if (myApp.isPhone) {
             client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: true}));
@@ -17,32 +17,22 @@ angular.module('myApp.services', [])
         }
 
         var service = {
-            authenticate: function (fn) {
-                LogService.log('start auth');
-                if (client._oauth._token === null) {
-                    LogService.log('auth token is null, client reset');
-                    this.reset();
-                }
-                try {
-                    client.authenticate(fn);
-                } catch (err) {
-                    LogService.log('catch err: ' + err);
-                    this.reset();
-                }
+            authenticate: function (options, fn) {
+                client.authenticate(options, fn);
             },
             reset: function () {
-                LogService.log('client reset');
+                console.log('client reset');
                 client.reset();
             },
             readNotes: function () {
-                LogService.log('start read notes');
+                console.log('start read notes');
                 var defered = $q.defer();
                 client.readFile("notes.txt", function (err, data) {
                     if (err) {
-                        LogService.log('read notes err: ' + err);
+                        console.log('read notes err: ' + err);
                         defered.reject(err);
                     } else {
-                        LogService.log('read notes resolved');
+                        console.log('read notes resolved');
                         defered.resolve(data);
                     }
                 });
@@ -59,13 +49,5 @@ angular.module('myApp.services', [])
 //            }
         };
 
-        return service;
-    })
-    .factory('LogService', function () {
-        var service = {
-            log: function (log) {
-                console.log(log);
-            }
-        }
         return service;
     });
