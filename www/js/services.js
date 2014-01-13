@@ -8,7 +8,7 @@
 angular.module('myApp.services', [])
     .value('version', '0.1')
     .factory('DropBoxService', function ($q) {
-        console.log('init dropbox client');
+//        console.log('init dropbox client');
         var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
         if (myApp.isPhone) {
             client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: true}));
@@ -21,18 +21,18 @@ angular.module('myApp.services', [])
                 client.authenticate(options, fn);
             },
             reset: function () {
-                console.log('client reset');
+//                console.log('client reset');
                 client.reset();
             },
             readNotes: function () {
-                console.log('start read notes');
+//                console.log('start read notes');
                 var defered = $q.defer();
                 client.readFile("notes.txt", function (err, data) {
                     if (err) {
-                        console.log('read notes err: ' + err);
+//                        console.log('read notes err: ' + err);
                         defered.reject(err);
                     } else {
-                        console.log('read notes resolved');
+//                        console.log('read notes resolved');
                         defered.resolve(data);
                     }
                 });
