@@ -37,16 +37,18 @@ angular.module('myApp.services', [])
                     }
                 });
                 return defered.promise;
+            },
+            writeNotes: function (data) {
+                var defered = $q.defer();
+                client.writeFile('notes.txt', data, function (err) {
+                    if (err) {
+                        defered.reject(err);
+                    } else {
+                        defered.resolve();
+                    }
+                });
+                return defered.promise;
             }
-//            writeNotes: function () {
-//                client.writeFile('notes.txt', 'Hello, World!a', function (error) {
-//                    if (error) {
-//                        window.alert('Error: ' + error);
-//                    } else {
-//                        window.alert('File written successfully!');
-//                    }
-//                });
-//            }
         };
 
         return service;

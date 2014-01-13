@@ -50,6 +50,16 @@ angular.module('myApp.controllers', [])
             });
         };
 
+        $scope.writeNotes = function () {
+            $scope.log('start write notes');
+            DropBoxService.writeNotes('write test data').then(function () {
+                $scope.log('write notes successful');
+            }), function (err) {
+                $scope.error('write notes error: ' + err);
+                $scope.resetDropboxClient();
+            }
+        }
+
         $scope.resetDropboxClient = function () {
             $scope.log('reset dropbox client');
             DropBoxService.reset();
