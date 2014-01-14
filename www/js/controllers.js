@@ -3,16 +3,46 @@
 /* Controllers */
 
 angular.module('myApp.controllers', [])
-    .controller('MyCtrl', ['$scope', '$location', 'DropBoxService', '$scope', function ($scope, $location, DropBoxService) {
+    .controller('MyCtrl', ['$scope', '$location', 'DropBoxService', 'Loading', function ($scope, $location, DropBoxService, Loading) {
 
         $scope.goto = function (value) {
             $location.path(value);
             // window.alert($scope.actualWidth + ',' + $scope.actualHeight + ',' + $scope.screenWidth + ',' + $scope.screenHeight);
         };
 
+        // Trigger the loading indicator
+        $scope.show = function () {
+
+            // Show the loading overlay and text
+            $scope.loading = Loading.show({
+
+                // The text to display in the loading indicator
+                content: 'Loading',
+
+                // The animation to use
+                animation: 'fade-in',
+
+                // Will a dark overlay or backdrop cover the entire view
+                showBackdrop: true,
+
+                // The maximum width of the loading indicator
+                // Text will be wrapped if longer than maxWidth
+                maxWidth: 200,
+
+                // The delay in showing the indicator
+                showDelay: 500
+            });
+        };
+
+        // Hide the loading indicator
+        $scope.hide = function () {
+            $scope.loading.hide();
+        };
+
         $scope.authDropbox = function (interactive) {
             $scope.showSigninButton = false;
             $scope.showWaitingBar = true;
+            $scope.show();
 
             if (interactive === null || interactive === undefined) {
                 interactive = true;
@@ -37,15 +67,17 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.readNotes = function () {
-            $scope.showWaitingBar = true;
             $scope.log('start read notes');
             // $scope.notes = DropBoxService.readNotes();
             DropBoxService.readNotes().then(function (notes) {
                 $scope.notes = notes;
                 $scope.showWaitingBar = false;
+                $scope.hide();
                 $scope.log('read notes done');
+                $scope.$broadcast('scroll.refreshComplete');
             }, function (err) {
                 $scope.error('read notes promise get error: ' + err);
+                $scope.$broadcast('scroll.refreshComplete');
                 $scope.resetDropboxClient();
             });
         };
@@ -65,6 +97,7 @@ angular.module('myApp.controllers', [])
             DropBoxService.reset();
             $scope.showSigninButton = true;
             $scope.showWaitingBar = false;
+            $scope.hide();
         };
 
         $scope.log = function (log) {
@@ -77,9 +110,17 @@ angular.module('myApp.controllers', [])
             $scope.errors = log;
         };
 
+        $scope.onRefresh = function () {
+            $scope.authDropbox(false);
+        }
+
         $scope.authDropbox(false);
     }])
 
-    .controller('MyCtrl1', [function () {
-
+    .controller('MyCtrl1', ['$scope', function ($scope) {
+        $scope.onRefresh = function () {
+            window.alert('refresh done!');
+            // Trigger refresh complete on the pull to refresh action
+            $scope.$broadcast('scroll.refreshComplete');
+        }
     }]);
