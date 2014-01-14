@@ -40,8 +40,8 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.authDropbox = function (interactive) {
-            $scope.showSigninButton = false;
-            $scope.showWaitingBar = true;
+//            $scope.showSigninButton = false;
+//            $scope.showWaitingBar = true;
             $scope.show();
 
             if (interactive === null || interactive === undefined) {
