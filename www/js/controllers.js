@@ -73,11 +73,10 @@ angular.module('myApp.controllers', [])
                 $scope.notes = notes;
                 $scope.showWaitingBar = false;
                 $scope.hide();
-                $scope.log('read notes done');
                 $scope.$broadcast('scroll.refreshComplete');
+                $scope.log('read notes done');
             }, function (err) {
                 $scope.error('read notes promise get error: ' + err);
-                $scope.$broadcast('scroll.refreshComplete');
                 $scope.resetDropboxClient();
             });
         };
@@ -98,6 +97,7 @@ angular.module('myApp.controllers', [])
             $scope.showSigninButton = true;
             $scope.showWaitingBar = false;
             $scope.hide();
+            $scope.$broadcast('scroll.refreshComplete');
         };
 
         $scope.log = function (log) {
