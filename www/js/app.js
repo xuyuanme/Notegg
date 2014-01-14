@@ -3,8 +3,8 @@
 
 // Declare app level module which depends on filters, and services
 var myApp = angular.module('myApp', [
-        'ngRoute',
-        'ngTouch',
+//        'ngRoute', // already included in ionic
+//        'ngTouch', // already included in ionic
         'ionic',
         'myApp.filters',
         'myApp.services',
