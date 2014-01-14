@@ -5,6 +5,7 @@
 var myApp = angular.module('myApp', [
         'ngRoute',
         'ngTouch',
+        'ionic',
         'myApp.filters',
         'myApp.services',
         'myApp.directives',
