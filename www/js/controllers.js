@@ -69,8 +69,9 @@ angular.module('myApp.controllers', [])
         $scope.readNotes = function () {
             $scope.log('start read notes');
             // $scope.notes = DropBoxService.readNotes();
-            DropBoxService.readNotes().then(function (notes) {
-                $scope.notes = notes;
+            DropBoxService.readNotes().then(function (result) {
+                $scope.versionTag = result.stat.versionTag;
+                $scope.notes = result.data;
                 $scope.showWaitingBar = false;
                 $scope.hide();
                 $scope.$broadcast('scroll.refreshComplete');
@@ -83,12 +84,13 @@ angular.module('myApp.controllers', [])
 
         $scope.writeNotes = function () {
             $scope.show();
-            $scope.log('start write notes');
-            DropBoxService.writeNotes($scope.notes).then(function () {
+            $scope.log('start write notes for versionTag: ' + $scope.versionTag);
+            DropBoxService.writeNotes($scope.notes, {lastVersionTag: $scope.versionTag}).then(function (stat) {
+                $scope.versionTag = stat.versionTag;
                 $scope.hide();
                 $scope.log('write notes successful');
             }), function (err) {
-                $scope.error('write notes error: ' + err);
+                $scope.error('write notes error for versionTag ' + $scope.versionTag + ': ' + err);
                 $scope.resetDropboxClient();
             }
         }

@@ -27,24 +27,24 @@ angular.module('myApp.services', [])
             readNotes: function () {
 //                console.log('start read notes');
                 var defered = $q.defer();
-                client.readFile("notes.txt", function (err, data) {
+                client.readFile("notes.txt", function (err, data, stat, range) {
                     if (err) {
 //                        console.log('read notes err: ' + err);
                         defered.reject(err);
                     } else {
 //                        console.log('read notes resolved');
-                        defered.resolve(data);
+                        defered.resolve({data: data, stat: stat, range: range});
                     }
                 });
                 return defered.promise;
             },
-            writeNotes: function (data) {
+            writeNotes: function (data, options) {
                 var defered = $q.defer();
-                client.writeFile('notes.txt', data, function (err) {
+                client.writeFile('notes.txt', data, options, function (err, stat) {
                     if (err) {
                         defered.reject(err);
                     } else {
-                        defered.resolve();
+                        defered.resolve(stat);
                     }
                 });
                 return defered.promise;
