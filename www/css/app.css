@@ -20,3 +20,10 @@
 .newline {
     white-space: pre;
 }
+
+.notepad {
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+}
