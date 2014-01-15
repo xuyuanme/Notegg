@@ -5,6 +5,17 @@
 angular.module('myApp.controllers', [])
     .controller('MyCtrl', ['$scope', '$location', 'DropBoxService', 'Loading', function ($scope, $location, DropBoxService, Loading) {
 
+        $scope.init = function () {
+            $scope.log('init MyCtrl');
+            $scope.notesContainer = {notes: ''};
+            if (!DropBoxService.isAuthenticated()) {
+                $scope.showSigninButton = true;
+            } else {
+                $scope.show();
+                $scope.readNotes();
+            }
+        }
+
         $scope.goto = function (value) {
             $location.path(value);
             // window.alert($scope.actualWidth + ',' + $scope.actualHeight + ',' + $scope.screenWidth + ',' + $scope.screenHeight);
@@ -39,16 +50,6 @@ angular.module('myApp.controllers', [])
             $scope.loading.hide();
         };
 
-        $scope.init = function () {
-            $scope.log('init MyCtrl');
-            if (!DropBoxService.isAuthenticated()) {
-                $scope.showSigninButton = true;
-            } else {
-                $scope.show();
-                $scope.readNotes();
-            }
-        }
-
         $scope.authDropbox = function (interactive) {
 //            $scope.showSigninButton = false;
 //            $scope.showWaitingBar = true;
@@ -81,7 +82,7 @@ angular.module('myApp.controllers', [])
             // $scope.notes = DropBoxService.readNotes();
             DropBoxService.readNotes().then(function (result) {
                 $scope.versionTag = result.stat.versionTag;
-                $scope.notes = result.data;
+                $scope.notesContainer.notes = result.data;
                 $scope.showWaitingBar = false;
                 $scope.hide();
                 $scope.$broadcast('scroll.refreshComplete');
@@ -95,7 +96,7 @@ angular.module('myApp.controllers', [])
         $scope.writeNotes = function () {
             $scope.show();
             $scope.log('start write notes for versionTag: ' + $scope.versionTag);
-            DropBoxService.writeNotes($scope.notes, {lastVersionTag: $scope.versionTag}).then(function (stat) {
+            DropBoxService.writeNotes($scope.notesContainer.notes, {lastVersionTag: $scope.versionTag}).then(function (stat) {
                 $scope.versionTag = stat.versionTag;
                 $scope.hide();
                 $scope.log('write notes successful');
