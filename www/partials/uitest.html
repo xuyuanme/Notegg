@@ -1,26 +1,24 @@
 <div class="bar bar-header bar-positive">
-    <h1 class="title">Note Egg</h1>
-    <button class="button icon ion-log-in">Sign In</button>
-    <button class="button icon ion-checkmark-round">Commit</button>
+    <h1 class="title">contenteditable div</h1>
 </div>
 
-<!-- content area -->
 <content
         has-header="true"
         has-footer="true"
         scroll="true"
-        on-refresh="onRefresh()"
         >
 
-    <!-- for pull to refresh -->
-    <refresher></refresher>
+    <div contenteditable="true"
+         style="-webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;">
+        <div>1. some note that should be editable</div>
+        <div>2. some note that should be editable</div>
+        <div>3. some note that should be editable</div>
+        <div>4. some note that should be editable</div>
+        <div>5. some note that should be editable</div>
+    </div>
 
-    <!-- content -->
-    <div ng-class="{hidden:!showWaitingBar}">Wait while retrieving data from Dropbox...</div>
-    <div class="newline" contentEditable ng-model="notes"></div>
 </content>
 
 <footer-bar>
-    <div style="color: blue">{{ logs }}</div>
-    <div ng-class="{hidden:!showSigninButton}" style="color: red">{{ errors }}</div>
+    <h1 class="title">Footer</h1>
 </footer-bar>
