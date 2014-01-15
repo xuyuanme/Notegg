@@ -13,7 +13,8 @@ angular.module('myApp.services', [])
         if (myApp.isPhone) {
             client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: true}));
         } else {
-            client.authDriver(new Dropbox.AuthDriver.Popup({ rememberUser: true, receiverUrl: document.location + 'auth_receiver.html' }));
+            client.authDriver(new Dropbox.AuthDriver.Redirect({ rememberUser: true }));
+//            client.authDriver(new Dropbox.AuthDriver.Popup({ rememberUser: true, receiverUrl: document.location + 'auth_receiver.html' }));
         }
         // fake auth first to see if there's catched token
         client.authenticate({interactive: false});
