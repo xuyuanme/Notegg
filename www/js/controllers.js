@@ -39,6 +39,16 @@ angular.module('myApp.controllers', [])
             $scope.loading.hide();
         };
 
+        $scope.init = function () {
+            $scope.log('init MyCtrl');
+            if (!DropBoxService.isAuthenticated()) {
+                $scope.showSigninButton = true;
+            } else {
+                $scope.show();
+                $scope.readNotes();
+            }
+        }
+
         $scope.authDropbox = function (interactive) {
 //            $scope.showSigninButton = false;
 //            $scope.showWaitingBar = true;
@@ -51,7 +61,7 @@ angular.module('myApp.controllers', [])
                 $scope.log('auth with interactive: ' + interactive);
                 if (err) {
                     $scope.error('auth err: ' + err);
-                    $scope.resetDropboxClient();
+                    $scope.resetUI();
                 } else {
                     if (client.isAuthenticated()) {
                         $scope.log('auth ok');
@@ -60,7 +70,7 @@ angular.module('myApp.controllers', [])
                         $scope.log('sent read notes request');
                     } else {
                         $scope.error('client not authenticated');
-                        $scope.resetDropboxClient();
+                        $scope.resetUI();
                     }
                 }
             });
@@ -78,7 +88,7 @@ angular.module('myApp.controllers', [])
                 $scope.log('read notes done');
             }, function (err) {
                 $scope.error('read notes promise get error: ' + err);
-                $scope.resetDropboxClient();
+                $scope.resetUI();
             });
         };
 
@@ -91,13 +101,12 @@ angular.module('myApp.controllers', [])
                 $scope.log('write notes successful');
             }), function (err) {
                 $scope.error('write notes error for versionTag ' + $scope.versionTag + ': ' + err);
-                $scope.resetDropboxClient();
+                $scope.resetUI();
             }
         }
 
-        $scope.resetDropboxClient = function () {
-            $scope.log('reset dropbox client');
-            DropBoxService.reset();
+        $scope.resetUI = function () {
+            $scope.log('reset ui');
             $scope.showSigninButton = true;
             $scope.showWaitingBar = false;
             $scope.hide();
@@ -118,7 +127,7 @@ angular.module('myApp.controllers', [])
             $scope.authDropbox(false);
         }
 
-        $scope.authDropbox(false);
+        $scope.init();
     }])
 
     .controller('MyCtrl1', ['$scope', function ($scope) {

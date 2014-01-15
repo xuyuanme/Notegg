@@ -15,10 +15,20 @@ angular.module('myApp.services', [])
         } else {
             client.authDriver(new Dropbox.AuthDriver.Popup({ rememberUser: true, receiverUrl: document.location + 'auth_receiver.html' }));
         }
+        // fake auth first to see if there's catched token
+        client.authenticate({interactive: false});
 
         var service = {
             authenticate: function (options, fn) {
-                client.authenticate(options, fn);
+                try {
+                    client.authenticate(options, fn);
+                } catch (err) {
+                    client.reset();
+                    fn(err);
+                }
+            },
+            isAuthenticated: function () {
+                return client.isAuthenticated();
             },
             reset: function () {
 //                console.log('client reset');
