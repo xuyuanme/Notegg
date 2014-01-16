@@ -17,7 +17,8 @@
 
     <!-- content -->
     <div ng-class="{hidden:!showWaitingBar}">Wait while retrieving data from Dropbox...</div>
-    <div class="newline notepad" contentEditable ng-model="notesContainer.notes"></div>
+    <!--<div class="newline notepad" contentEditable ng-model="notesContainer.notes"></div>-->
+    <textarea class="topcoat-textarea" rows="15" placeholder="Enter your first note" ng-model="notesContainer.notes"></textarea>
 </content>
 
 <footer-bar>
