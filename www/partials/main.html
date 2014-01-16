@@ -1,4 +1,5 @@
 <div class="bar bar-header bar-positive">
+    <button class="button icon ion-refresh" ng-class="{hidden:showWaitingBar||showSigninButton}" ng-click="onRefresh()"></button>
     <h1 class="title">Note Egg</h1>
     <button class="button icon ion-log-in" ng-class="{hidden:!showSigninButton}" ng-click="authDropbox()">Sign In</button>
     <button class="button icon ion-checkmark-round" ng-class="{hidden:showWaitingBar||showSigninButton}" ng-click="writeNotes()">Commit</button>
