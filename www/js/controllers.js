@@ -89,13 +89,20 @@ angular.module('myApp.controllers', [])
                 $scope.log('read notes done');
             }, function (err) {
                 $scope.error('read notes promise get error: ' + err);
-                $scope.resetUI();
+                if (err.status == 404) {
+                    $scope.writeNotes();
+                } else {
+                    $scope.resetUI();
+                }
             });
         };
 
         $scope.writeNotes = function () {
             $scope.show();
             $scope.log('start write notes for versionTag: ' + $scope.versionTag);
+            if ($scope.notesContainer.notes === '') {
+                $scope.notesContainer.notes = "Write your first note here";
+            }
             DropBoxService.writeNotes($scope.notesContainer.notes, {lastVersionTag: $scope.versionTag}).then(function (stat) {
                 $scope.versionTag = stat.versionTag;
                 $scope.hide();
