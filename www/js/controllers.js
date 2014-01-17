@@ -9,7 +9,9 @@ angular.module('myApp.controllers', [])
             $scope.log('init MyCtrl');
             $scope.notesContainer = {notes: ''};
             if (!DropBoxService.isAuthenticated()) {
-                $scope.showSigninButton = true;
+                $scope.log('reset dropbox client');
+                DropBoxService.reset();
+                $scope.resetUI();
             } else {
                 $scope.show();
                 $scope.readNotes();
@@ -89,8 +91,14 @@ angular.module('myApp.controllers', [])
                 $scope.log('read notes done');
             }, function (err) {
                 $scope.error('read notes promise get error: ' + err);
-                if (err.status == 404) {
+                if (err.status === Dropbox.ApiError.INVALID_TOKEN) {
+                    $scope.log('reset dropbox client');
+                    DropBoxService.reset();
+                    $scope.resetUI();
+                } else if (err.status === Dropbox.ApiError.NOT_FOUND) {
                     $scope.writeNotes();
+                } else if (err.status === Dropbox.ApiError.NETWORK_ERROR) {
+
                 } else {
                     $scope.resetUI();
                 }
