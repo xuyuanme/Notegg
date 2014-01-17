@@ -24,30 +24,30 @@ angular.module('myApp.controllers', [])
         // Trigger the loading indicator
         $scope.show = function () {
 
-            // Show the loading overlay and text
-            $scope.loading = Loading.show({
-
-                // The text to display in the loading indicator
-                content: 'Loading',
-
-                // The animation to use
-                animation: 'fade-in',
-
-                // Will a dark overlay or backdrop cover the entire view
-                showBackdrop: true,
-
-                // The maximum width of the loading indicator
-                // Text will be wrapped if longer than maxWidth
-                maxWidth: 200,
-
-                // The delay in showing the indicator
-                showDelay: 500
-            });
+//            // Show the loading overlay and text
+//            $scope.loading = Loading.show({
+//
+//                // The text to display in the loading indicator
+//                content: 'Loading',
+//
+//                // The animation to use
+//                animation: 'fade-in',
+//
+//                // Will a dark overlay or backdrop cover the entire view
+//                showBackdrop: true,
+//
+//                // The maximum width of the loading indicator
+//                // Text will be wrapped if longer than maxWidth
+//                maxWidth: 200,
+//
+//                // The delay in showing the indicator
+//                showDelay: 500
+//            });
         };
 
         // Hide the loading indicator
         $scope.hide = function () {
-            $scope.loading.hide();
+//            $scope.loading.hide();
         };
 
         $scope.authDropbox = function (interactive) {
