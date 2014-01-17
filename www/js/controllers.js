@@ -15,7 +15,7 @@ angular.module('myApp.controllers', [])
                 $scope.resetUI();
             } else {
                 $scope.show();
-                $scope.readNotes();
+                $scope.authDropbox(false);
             }
         }
 
