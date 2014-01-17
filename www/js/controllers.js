@@ -75,6 +75,7 @@ angular.module('myApp.controllers', [])
                         $scope.log('auth ok');
                         $scope.uiContainer.showSigninButton = false;
                         $scope.uiContainer.showWaitingBar = false;
+                        $scope.$apply();
                         $scope.readNotes();
                         $scope.log('sent read notes request');
                     } else {
