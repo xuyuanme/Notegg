@@ -8,6 +8,7 @@ angular.module('myApp.controllers', [])
         $scope.init = function () {
             $scope.log('init MyCtrl');
             $scope.notesContainer = {notes: ''};
+            $scope.uiContainer = {showSigninButton: false, showWaitingBar: true};
             if (!DropBoxService.isAuthenticated()) {
                 $scope.log('reset dropbox client');
                 DropBoxService.reset();
@@ -53,12 +54,16 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.authDropbox = function (interactive) {
-//            $scope.showSigninButton = false;
-//            $scope.showWaitingBar = true;
+//            $scope.uiContainer.showSigninButton = false;
+//            $scope.uiContainer.showWaitingBar = true;
             $scope.show();
 
             if (interactive === null || interactive === undefined) {
                 interactive = true;
+            }
+            if (interactive) {
+                // if it's active auth triggered by user, means sth is wrong, reset first
+                DropBoxService.reset();
             }
             DropBoxService.authenticate({interactive: interactive}, function (err, client) {
                 $scope.log('auth with interactive: ' + interactive);
@@ -68,7 +73,8 @@ angular.module('myApp.controllers', [])
                 } else {
                     if (client.isAuthenticated()) {
                         $scope.log('auth ok');
-                        $scope.showSigninButton = false;
+                        $scope.uiContainer.showSigninButton = false;
+                        $scope.uiContainer.showWaitingBar = false;
                         $scope.readNotes();
                         $scope.log('sent read notes request');
                     } else {
@@ -85,7 +91,7 @@ angular.module('myApp.controllers', [])
             DropBoxService.readNotes().then(function (result) {
                 $scope.versionTag = result.stat.versionTag;
                 $scope.notesContainer.notes = result.data;
-                $scope.showWaitingBar = false;
+                $scope.uiContainer.showWaitingBar = false;
                 $scope.hide();
                 $scope.$broadcast('scroll.refreshComplete');
                 $scope.log('read notes done');
@@ -96,7 +102,7 @@ angular.module('myApp.controllers', [])
                     DropBoxService.reset();
                     $scope.resetUI();
                 } else if (err.status === Dropbox.ApiError.NOT_FOUND) {
-                    $scope.writeNotes();
+//                    $scope.writeNotes();
                 } else if (err.status === Dropbox.ApiError.NETWORK_ERROR) {
 
                 } else {
@@ -123,8 +129,8 @@ angular.module('myApp.controllers', [])
 
         $scope.resetUI = function () {
             $scope.log('reset ui');
-            $scope.showSigninButton = true;
-            $scope.showWaitingBar = false;
+            $scope.uiContainer.showSigninButton = true;
+            $scope.uiContainer.showWaitingBar = false;
             $scope.hide();
             $scope.$broadcast('scroll.refreshComplete');
         };
