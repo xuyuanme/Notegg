@@ -24,8 +24,11 @@ angular.module('myApp.services', [])
                 try {
                     client.authenticate(options, fn);
                 } catch (err) {
-                    client.reset();
-                    fn(err);
+                    // Ignore unresolved error: [$rootScope:infdig] 10 $digest() iterations reached
+                    if (err.message.indexOf("iterations reached") === -1) {
+                        client.reset();
+                        fn(err);
+                    }
                 }
             },
             isAuthenticated: function () {
