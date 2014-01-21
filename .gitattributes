@@ -1,0 +1,16 @@
+# .gitattributes
+*.java eol=lf
+*.css eol=lf
+*.svg eol=lf
+*.js eol=lf
+*.js.map eol=lf
+*.html eol=lf
+*.htm eol=lf
+*.jsp eol=lf
+*.xml eol=lf
+*.properties eol=lf
+*.md eol=lf
+*.json eol=lf
+.htaccess eol=lf
+.gitattributes eol=lf
+.gitignore eol=lf
