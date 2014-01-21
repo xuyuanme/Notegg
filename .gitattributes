@@ -8,6 +8,7 @@
 *.htm eol=lf
 *.jsp eol=lf
 *.xml eol=lf
+*.txt eol=lf
 *.properties eol=lf
 *.md eol=lf
 *.json eol=lf
