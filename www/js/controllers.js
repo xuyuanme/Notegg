@@ -3,7 +3,7 @@
 /* Controllers */
 
 angular.module('myApp.controllers', [])
-    .controller('MyCtrl', ['$scope', '$location', 'DropBoxService', 'Loading', function ($scope, $location, DropBoxService, Loading) {
+    .controller('MyCtrl', ['$scope', '$location', 'DropBoxService', function ($scope, $location, DropBoxService) {
 
         $scope.init = function () {
             $scope.log('init MyCtrl');
