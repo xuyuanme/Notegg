@@ -8,7 +8,15 @@
     <script>
         if (document.URL.indexOf('https://') !== -1 || document.URL.indexOf('http://') !== -1) {
             // if not phonegap, set base url for html5mode
-            document.write('<base href="' + document.location + '" />');
+            // document.write('<base href="' + document.location + '" />');
+
+            // adapt ui-route, see: https://github.com/angular-ui/ui-router/wiki/Frequently-Asked-Questions#wiki-issue-my-assets-and-templates-are-not-loading
+            var baseUrls = document.location.toString().split("/");
+            if (baseUrls[4] === "www") {
+                document.write('<base href="/' + baseUrls[3] + '/' + baseUrls[4] + '/" />');
+            } else {
+                document.write('<base href="/' + baseUrls[3] + '/" />');
+            }
         }
     </script>
     <script src="cordova.js"></script>
