@@ -161,4 +161,93 @@ angular.module('myApp.controllers', [])
             // Trigger refresh complete on the pull to refresh action
             $scope.$broadcast('scroll.refreshComplete');
         }
-    }]);
+    }])
+
+    .controller('NoteCtrl', function ($scope, $timeout, $ionicModal, Notebooks) {
+
+        // A utility function for creating a new notebook
+        // with the given notebookTitle
+        var createNotebook = function (notebookTitle) {
+            var newNotebook = Notebooks.newNotebook(notebookTitle);
+            $scope.notebooks.push(newNotebook);
+            Notebooks.save($scope.notebooks);
+            $scope.selectNotebook(newNotebook, $scope.notebooks.length - 1);
+        }
+
+        // Load or initialize notebooks
+        $scope.notebooks = Notebooks.all();
+
+        // Grab the last active, or the first notebook
+        $scope.activeNotebook = $scope.notebooks[Notebooks.getLastActiveIndex()];
+
+        // Called to create a new notebook
+        $scope.newNotebook = function () {
+            var notebookTitle = prompt('Notebook name');
+            if (notebookTitle) {
+                createNotebook(notebookTitle);
+            }
+        };
+
+        // Called to select the given notebook
+        $scope.selectNotebook = function (notebook, index) {
+            $scope.activeNotebook = notebook;
+            Notebooks.setLastActiveIndex(index);
+            $scope.sideMenuController.close();
+        };
+
+        // Create our modal
+        $ionicModal.fromTemplateUrl('partials/new-note.html', function (modal) {
+            $scope.noteModal = modal;
+        }, {
+            scope: $scope
+        });
+
+        $scope.createNote = function (note) {
+            if (!$scope.activeNotebook) {
+                return;
+            }
+            $scope.activeNotebook.notes.push({
+                title: note.title
+            });
+            $scope.noteModal.hide();
+
+            // Inefficient, but save all the notebooks
+            Notebooks.save($scope.notebooks);
+
+            note.title = "";
+        };
+
+        $scope.newNote = function () {
+            $scope.noteModal.show();
+        };
+
+        $scope.closeNewNote = function () {
+            $scope.noteModal.hide();
+        }
+
+        $scope.toggleNotebooks = function () {
+            $scope.sideMenuController.toggleLeft();
+        };
+
+        $scope.itemButtons = [
+            {
+                text: 'Edit',
+                type: 'button-assertive',
+                onTap: function(item) {
+                    alert('Edit Item: ' + item.id);
+                }
+            },
+            {
+                text: 'Share',
+                type: 'button-calm',
+                onTap: function(item) {
+                    alert('Share Item: ' + item.id);
+                }
+            }
+        ];
+
+        $scope.onItemDelete = function(item) {
+            window.alert("in!");
+        };
+
+    });

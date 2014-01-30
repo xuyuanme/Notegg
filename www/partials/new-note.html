@@ -1,0 +1,25 @@
+<div class="modal">
+
+    <!-- Modal header bar -->
+    <header class="bar bar-header bar-secondary">
+        <h1 class="title">New Note</h1>
+        <button class="button button-clear button-positive" ng-click="closeNewNote()">Cancel</button>
+    </header>
+
+    <!-- Modal content area -->
+    <content has-header="true">
+
+        <form ng-submit="createNote(note)">
+            <div class="list">
+                <label class="item item-input">
+                    <input type="text" placeholder="What do you need to do?" ng-model="note.title">
+                </label>
+            </div>
+            <div class="padding">
+                <button type="submit" class="button button-block button-positive">Create Note</button>
+            </div>
+        </form>
+
+    </content>
+
+</div>

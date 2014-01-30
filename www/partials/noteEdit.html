@@ -1,0 +1,29 @@
+<div class="bar bar-header bar-positive">
+    <a class="button button-icon icon ion-arrow-left-c" href="home"></a>
+    <button class="button icon ion-refresh" ng-hide="uiContainer.showWaitingBar||uiContainer.showSigninButton" ng-click="onRefresh()"></button>
+    <h1 class="title">Note Egg</h1>
+    <button class="button icon ion-log-in" ng-show="uiContainer.showSigninButton" ng-click="authDropbox()">Sign In</button>
+    <button class="button icon ion-checkmark-round" ng-hide="uiContainer.showWaitingBar||uiContainer.showSigninButton" ng-click="writeNotes()">Commit</button>
+</div>
+
+<!-- content area -->
+<content
+        has-header="true"
+        has-footer="true"
+        scroll="true"
+        overflow-scroll="true"
+        on-refresh="onRefresh()"
+        >
+
+    <!-- for pull to refresh -->
+    <refresher></refresher>
+
+    <!-- content -->
+    <div ng-show="uiContainer.showWaitingBar">Wait while retrieving data from Dropbox...</div>
+    <div class="newline notepad" contentEditable ng-model="notesContainer.notes"></div>
+</content>
+
+<footer-bar>
+    <div style="color: blue">{{ logs }}</div>
+    <div ng-show="uiContainer.showSigninButton" style="color: red">{{ errors }}</div>
+</footer-bar>

@@ -66,4 +66,31 @@ angular.module('myApp.services', [])
         };
 
         return service;
+    })
+    .factory('Notebooks', function () {
+        return {
+            all: function () {
+                var notebookString = window.localStorage['notebooks'];
+                if (notebookString) {
+                    return angular.fromJson(notebookString);
+                }
+                return [];
+            },
+            save: function (notebooks) {
+                window.localStorage['notebooks'] = angular.toJson(notebooks);
+            },
+            newNotebook: function (notebookTitle) {
+                // Add a new project
+                return {
+                    title: notebookTitle,
+                    notes: []
+                };
+            },
+            getLastActiveIndex: function () {
+                return parseInt(window.localStorage['lastActiveNotebook']) || 0;
+            },
+            setLastActiveIndex: function (index) {
+                window.localStorage['lastActiveNotebook'] = index;
+            }
+        }
     });
