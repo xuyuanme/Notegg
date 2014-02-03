@@ -163,7 +163,7 @@ angular.module('myApp.controllers', [])
         }
     }])
 
-    .controller('NoteCtrl', function ($scope, $timeout, $ionicModal, Notebooks) {
+    .controller('NoteCtrl', function ($scope, $ionicModal, Notebooks) {
 
         // A utility function for creating a new notebook
         // with the given notebookTitle
@@ -231,23 +231,31 @@ angular.module('myApp.controllers', [])
 
         $scope.itemButtons = [
             {
-                text: 'Edit',
+                text: 'Delete',
                 type: 'button-assertive',
-                onTap: function(item) {
-                    alert('Edit Item: ' + item.id);
-                }
-            },
-            {
-                text: 'Share',
-                type: 'button-calm',
-                onTap: function(item) {
-                    alert('Share Item: ' + item.id);
+                onTap: function (item) {
+                    $scope.activeNotebook.notes.splice($scope.activeNotebook.notes.indexOf(item), 1);
+                    Notebooks.save($scope.notebooks);
                 }
             }
         ];
 
-        $scope.onItemDelete = function(item) {
-            window.alert("in!");
+        $scope.onItemDelete = function (item) {
+            $scope.notebooks.splice($scope.notebooks.indexOf(item), 1);
+            Notebooks.save($scope.notebooks);
         };
 
+        $scope.setActiveNote = function (index) {
+            if (index === undefined) {
+                index = -1;
+            }
+            Notebooks.setActiveNoteIndex(index);
+        };
+    })
+    .controller('EditNoteCtrl', function ($scope, Notebooks) {
+        $scope.activeNote = Notebooks.getActiveNote();
+
+        $scope.writeNote = function (item) {
+            Notebooks.writeNote(item);
+        }
     });

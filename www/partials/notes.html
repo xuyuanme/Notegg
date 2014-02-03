@@ -3,16 +3,19 @@
     <!-- Center content -->
     <pane side-menu-content>
         <header class="bar bar-header bar-positive">
-            <button class="button button-icon icon ion-ios7-minus-outline"
-                    ng-click="showDelete=!showDelete"></button>
-            <h1 class="title">{{activeNotebook.title}}</h1>
-            <button class="button icon ion-plus" ng-click="newNote()">
-                New
+            <!--<button class="button button-icon icon ion-ios7-minus-outline"-->
+            <!--ng-click="showDelete=!showDelete"></button>-->
+            <button class="button button-icon" ng-click="toggleNotebooks()">
+                <i class="icon ion-navicon-round"></i>
             </button>
+            <h1 class="title">{{activeNotebook.title}}</h1>
+            <a class="button icon ion-plus" href="noteEdit" ng-click="setActiveNote(-1)">
+                New
+            </a>
         </header>
         <content has-header="true" scroll="true">
-            <list show-delete="showDelete" on-delete="onItemDelete(item)" option-buttons="itemButtons">
-                <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="item" href="noteEdit">
+            <list option-buttons="itemButtons">
+                <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="note" href="noteEdit" ng-click="setActiveNote($index)">
                     {{note.title}}
                 </item>
             </list>
@@ -25,12 +28,13 @@
             <button class="button button-icon icon ion-ios7-minus-outline"
                     ng-click="showDelete=!showDelete"></button>
             <h1 class="title">Notebooks</h1>
-            <button class="button icon ion-plus" ng-click="newNotebook()"></button>
+            <button class="button button-icon icon ion-ios7-plus-outline" ng-click="newNotebook()"></button>
         </header>
         <content has-header="true" scroll="false">
-            <list show-delete="showDelete" on-delete="onItemDelete(item)" can-reorder="true" show-reorder="true">
+            <list show-delete="showDelete" on-delete="onItemDelete(item)" can-reorder="true" show-reorder="true"
+                  reorder-icon="ion-drag">
                 <item ng-repeat="notebook in notebooks" ng-click="selectNotebook(notebook)"
-                      ng-class="{active: activeNotebook == notebook}">
+                      ng-class="{active: activeNotebook == notebook}" item="notebook">
                     {{notebook.title}}
                 </item>
             </list>
