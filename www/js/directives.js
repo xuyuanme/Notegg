@@ -22,10 +22,11 @@ angular.module('myApp.directives', [])
                 // options
                 var opts = {}
                 angular.forEach([
+                    'plainText',
                     'stripBr',
                     'noLineBreaks',
                     'selectNonEditable',
-                    'moveCaretToEndOnChange',
+                    'moveCaretToEndOnChange'
                 ], function (opt) {
                     var o = attrs[opt]
                     opts[opt] = o && o !== 'false'
@@ -35,8 +36,12 @@ angular.module('myApp.directives', [])
                 element.bind('input', function (e) {
                     scope.$apply(function () {
                         var html, html2, rerender
-                        html = element.html()
                         rerender = false
+                        if (opts.plainText) {
+                            html = element[0].innerText
+                        } else {
+                            html = element.html()
+                        }
                         if (opts.stripBr) {
                             html = html.replace(/<br>$/, '')
                         }
