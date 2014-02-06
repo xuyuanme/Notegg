@@ -198,7 +198,7 @@ angular.module('myApp.controllers', [])
                 navigator.notification.prompt(
                     "Please enter notebook name", // message
                     function (answer) {
-                        if (answer.buttonIndex === 1 && answer.input1 !== '') {
+                        if (answer.buttonIndex === 2 && answer.input1 !== '') {
                             // Ok
                             createNotebook(answer.input1);
                         }
@@ -207,7 +207,7 @@ angular.module('myApp.controllers', [])
                         }
                     }, // callback
                     "New Notebook", //title
-                    ["Ok", "Exit"], // button titles
+                    ["Cancel", "OK"], // button titles
                     new String() // defaultText
                 );
             }
@@ -271,12 +271,21 @@ angular.module('myApp.controllers', [])
         ];
 
         $scope.onNotebookDelete = function (item) {
-            $scope.notebooks.splice(item, 1);
-            if (Notebooks.getLastActiveIndex() === item) {
-                $scope.selectNotebook(0, true);
-            }
-            Notebooks.save($scope.notebooks);
-            notebookDeleted = true;
+            navigator.notification.confirm(
+                'Delete Notebook "' + $scope.notebooks[item].title + '"?', // message
+                function (buttonIndex) {
+                    if (buttonIndex === 1) {
+                        $scope.notebooks.splice(item, 1);
+                        if (Notebooks.getLastActiveIndex() === item) {
+                            $scope.selectNotebook(0, true);
+                        }
+                        Notebooks.save($scope.notebooks);
+                        notebookDeleted = true;
+                    }
+                },            // callback to invoke with index of button pressed
+                'Warning',           // title
+                'OK,Cancel'         // buttonLabels
+            );
         };
 
         $scope.setActiveNote = function (index) {
