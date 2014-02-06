@@ -33,7 +33,7 @@
         <content has-header="true" scroll="false">
             <list show-delete="showDelete" on-delete="onItemDelete(item)" can-reorder="true" show-reorder="true"
                   reorder-icon="ion-drag">
-                <item ng-repeat="notebook in notebooks" ng-click="selectNotebook(notebook)"
+                <item ng-repeat="notebook in notebooks" ng-click="selectNotebook(notebook, $index)"
                       ng-class="{active: activeNotebook == notebook}" item="notebook">
                     {{notebook.title}}
                 </item>
