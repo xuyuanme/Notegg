@@ -175,6 +175,14 @@ angular.module('myApp.controllers', [])
             $scope.selectNotebook($scope.notebooks.length - 1);
         }
 
+        var deleteNotebook = function (item) {
+            $scope.notebooks.splice(item, 1);
+            if (Notebooks.getLastActiveIndex() === item) {
+                $scope.selectNotebook(0, true);
+            }
+            Notebooks.save($scope.notebooks);
+        }
+
         var init = function () {
             // Load or initialize notebooks
             $scope.notebooks = Notebooks.all();
@@ -271,21 +279,24 @@ angular.module('myApp.controllers', [])
         ];
 
         $scope.onNotebookDelete = function (item) {
-            navigator.notification.confirm(
-                'Delete Notebook "' + $scope.notebooks[item].title + '"?', // message
-                function (buttonIndex) {
-                    if (buttonIndex === 1) {
-                        $scope.notebooks.splice(item, 1);
-                        if (Notebooks.getLastActiveIndex() === item) {
-                            $scope.selectNotebook(0, true);
+            if (document.URL.indexOf('https://') !== -1 || document.URL.indexOf('http://') !== -1) {
+                if (confirm('Delete Notebook "' + $scope.notebooks[item].title + '"?')) {
+                    deleteNotebook(item);
+                }
+            } else {
+                navigator.notification.confirm(
+                    'Delete Notebook "' + $scope.notebooks[item].title + '"?', // message
+                    function (buttonIndex) {
+                        if (buttonIndex === 1) {
+                            deleteNotebook(item);
                         }
-                        Notebooks.save($scope.notebooks);
-                        notebookDeleted = true;
-                    }
-                },            // callback to invoke with index of button pressed
-                'Warning',           // title
-                'OK,Cancel'         // buttonLabels
-            );
+                    },            // callback to invoke with index of button pressed
+                    'Warning',           // title
+                    'OK,Cancel'         // buttonLabels
+                );
+            }
+            // anyway, mark the notebookDeleted flag as true, so the side menu won't close
+            notebookDeleted = true;
         };
 
         $scope.setActiveNote = function (index) {
