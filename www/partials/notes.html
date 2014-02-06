@@ -9,13 +9,13 @@
                 <i class="icon ion-navicon-round"></i>
             </button>
             <h1 class="title">{{activeNotebook.title}}</h1>
-            <a class="button icon ion-plus" href="#/noteEdit" ng-click="setActiveNote(-1)">
+            <a class="button icon ion-plus" href="#/noteEdit" ng-click="setActiveNote(-1)" ng-if="activeNotebook">
                 New
             </a>
         </header>
         <content has-header="true" scroll="true">
             <list option-buttons="itemButtons">
-                <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="note" href="#/noteEdit" ng-click="setActiveNote($index)">
+                <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="$index" href="#/noteEdit" ng-click="setActiveNote($index)">
                     {{note.title}}
                 </item>
             </list>
@@ -31,10 +31,10 @@
             <button class="button button-icon icon ion-ios7-plus-outline" ng-click="newNotebook()"></button>
         </header>
         <content has-header="true" scroll="false">
-            <list show-delete="showDelete" on-delete="onItemDelete(item)" can-reorder="true" show-reorder="true"
-                  reorder-icon="ion-drag">
-                <item ng-repeat="notebook in notebooks" ng-click="selectNotebook(notebook, $index)"
-                      ng-class="{active: activeNotebook == notebook}" item="notebook">
+            <list show-delete="showDelete" on-delete="onNotebookDelete(item)" can-reorder="true" show-reorder="true"
+                  reorder-icon="ion-drag" on-reorder="onReorder(el, start, end)">
+                <item ng-repeat="notebook in notebooks" ng-click="selectNotebook($index)"
+                      ng-class="{active: activeNotebook == notebook}" item="$index">
                     {{notebook.title}}
                 </item>
             </list>

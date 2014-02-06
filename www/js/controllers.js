@@ -164,6 +164,7 @@ angular.module('myApp.controllers', [])
     }])
 
     .controller('NoteCtrl', function ($scope, $ionicModal, Notebooks) {
+        var notebookDeleted = false;
 
         // A utility function for creating a new notebook
         // with the given notebookTitle
@@ -171,7 +172,7 @@ angular.module('myApp.controllers', [])
             var newNotebook = Notebooks.newNotebook(notebookTitle);
             $scope.notebooks.push(newNotebook);
             Notebooks.save($scope.notebooks);
-            $scope.selectNotebook(newNotebook, $scope.notebooks.length - 1);
+            $scope.selectNotebook($scope.notebooks.length - 1);
         }
 
         var init = function () {
@@ -213,12 +214,15 @@ angular.module('myApp.controllers', [])
         };
 
         // Called to select the given notebook
-        $scope.selectNotebook = function (notebook, index) {
-            $scope.activeNotebook = notebook;
-            Notebooks.setLastActiveIndex(index);
-            if ($scope.sideMenuController) {
-                $scope.sideMenuController.close();
+        $scope.selectNotebook = function (index, keepMenuOpen) {
+            if (!notebookDeleted) {
+                $scope.activeNotebook = $scope.notebooks[index];
+                Notebooks.setLastActiveIndex(index);
+                if ($scope.sideMenuController && !keepMenuOpen) {
+                    $scope.sideMenuController.close();
+                }
             }
+            notebookDeleted = false;
         };
 
         // Create our modal
@@ -260,15 +264,19 @@ angular.module('myApp.controllers', [])
                 text: 'Delete',
                 type: 'button-assertive',
                 onTap: function (item) {
-                    $scope.activeNotebook.notes.splice($scope.activeNotebook.notes.indexOf(item), 1);
+                    $scope.activeNotebook.notes.splice(item, 1);
                     Notebooks.save($scope.notebooks);
                 }
             }
         ];
 
-        $scope.onItemDelete = function (item) {
-            $scope.notebooks.splice($scope.notebooks.indexOf(item), 1);
+        $scope.onNotebookDelete = function (item) {
+            $scope.notebooks.splice(item, 1);
+            if (Notebooks.getLastActiveIndex() === item) {
+                $scope.selectNotebook(0, true);
+            }
             Notebooks.save($scope.notebooks);
+            notebookDeleted = true;
         };
 
         $scope.setActiveNote = function (index) {
@@ -277,6 +285,16 @@ angular.module('myApp.controllers', [])
             }
             Notebooks.setActiveNoteIndex(index);
         };
+
+        $scope.onReorder = function (el, oldIndex, newIndex) {
+            if (oldIndex !== newIndex) {
+                var tempNode = $scope.notebooks[newIndex];
+                $scope.notebooks[newIndex] = $scope.notebooks[oldIndex];
+                $scope.notebooks[oldIndex] = tempNode;
+                tempNode = null;
+            }
+            Notebooks.save($scope.notebooks);
+        }
 
         init();
     })
