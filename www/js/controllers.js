@@ -177,7 +177,9 @@ angular.module('myApp.controllers', [])
 
         var deleteNotebook = function (item) {
             $scope.notebooks.splice(item, 1);
-            if (Notebooks.getLastActiveIndex() === item) {
+            if ($scope.notebooks.length === 0) {
+                $scope.activeNotebook = null;
+            } else if (Notebooks.getLastActiveIndex() === item) {
                 $scope.selectNotebook(0, true);
             }
             Notebooks.save($scope.notebooks);
