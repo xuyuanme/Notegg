@@ -289,6 +289,7 @@ angular.module('myApp.controllers', [])
                     function (buttonIndex) {
                         if (buttonIndex === 1) {
                             deleteNotebook(item);
+                            $scope.$apply();
                         }
                     },            // callback to invoke with index of button pressed
                     'Warning',           // title
