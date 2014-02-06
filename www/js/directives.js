@@ -106,6 +106,9 @@ angular.module('myApp.directives', [])
                         }
                     })
                 }
+                element.bind('click', function (e) {
+                    element[0].focus();
+                })
             }
         }
     }]);
