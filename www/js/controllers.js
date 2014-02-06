@@ -182,25 +182,28 @@ angular.module('myApp.controllers', [])
 
         // Called to create a new notebook
         $scope.newNotebook = function () {
-//            var notebookTitle = prompt('Notebook name');
-//            if (notebookTitle) {
-//                createNotebook(notebookTitle);
-//            }
-
-            navigator.notification.prompt(
-                "Please enter notebook name", // message
-                function(answer) {
-                    if (answer.buttonIndex === 1) {
-                        // Ok
-                        createNotebook(answer.input1);
-                    }
-                    else {
-                        // Exit
-                    }
-                }, // callback
-                "New Notebook", //title
-                ["Ok", "Exit"] // button titles
-            );
+            if (document.URL.indexOf('https://') !== -1 || document.URL.indexOf('http://') !== -1) {
+                var notebookTitle = prompt('Notebook Name');
+                if (notebookTitle) {
+                    createNotebook(notebookTitle);
+                }
+            } else {
+                navigator.notification.prompt(
+                    "Please enter notebook name", // message
+                    function (answer) {
+                        if (answer.buttonIndex === 1 && answer.input1 !== '') {
+                            // Ok
+                            createNotebook(answer.input1);
+                        }
+                        else {
+                            // Exit
+                        }
+                    }, // callback
+                    "New Notebook", //title
+                    ["Ok", "Exit"], // button titles
+                    new String() // defaultText
+                );
+            }
         };
 
         // Called to select the given notebook
