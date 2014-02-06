@@ -22,7 +22,7 @@
     -moz-user-select: auto;
     -ms-user-select: auto;
     user-select: auto;
-    height: 50%;
+    height: 200%;
 }
 
 .arrowList a.item-content:after {
