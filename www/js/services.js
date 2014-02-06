@@ -111,11 +111,15 @@ angular.module('myApp.services', [])
             },
             writeNote: function (note) {
                 var notebooks = this.all();
-                note.title = note.content.split('\n')[0];
-                if (activeNoteIndex === -1) {
-                    notebooks[this.getLastActiveIndex()].notes.push(note);
+                if (note && note.content !== '') {
+                    note.title = note.content.split('\n')[0];
+                    if (activeNoteIndex === -1) {
+                        notebooks[this.getLastActiveIndex()].notes.push(note);
+                    } else {
+                        notebooks[this.getLastActiveIndex()].notes[activeNoteIndex] = note;
+                    }
                 } else {
-                    notebooks[this.getLastActiveIndex()].notes[activeNoteIndex] = note;
+                    notebooks[this.getLastActiveIndex()].notes.splice(activeNoteIndex, 1);
                 }
                 this.save(notebooks);
             }
