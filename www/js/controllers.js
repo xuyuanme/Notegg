@@ -200,17 +200,17 @@ angular.module('myApp.controllers', [])
         // Called to create a new notebook
         $scope.newNotebook = function () {
             if (document.URL.indexOf('https://') !== -1 || document.URL.indexOf('http://') !== -1) {
-                var notebookTitle = prompt('Notebook Name');
-                if (notebookTitle) {
+                var notebookTitle = prompt('Notebook Name').trim();
+                if (notebookTitle !== '') {
                     createNotebook(notebookTitle);
                 }
             } else {
                 navigator.notification.prompt(
                     "Please enter notebook name", // message
                     function (answer) {
-                        if (answer.buttonIndex === 2 && answer.input1 !== '') {
+                        if (answer.buttonIndex === 2 && answer.input1.trim() !== '') {
                             // Ok
-                            createNotebook(answer.input1);
+                            createNotebook(answer.input1.trim());
                         }
                         else {
                             // Exit
