@@ -174,11 +174,17 @@ angular.module('myApp.controllers', [])
             $scope.selectNotebook(newNotebook, $scope.notebooks.length - 1);
         }
 
-        // Load or initialize notebooks
-        $scope.notebooks = Notebooks.all();
+        var init = function () {
+            // Load or initialize notebooks
+            $scope.notebooks = Notebooks.all();
 
-        // Grab the last active, or the first notebook
-        $scope.activeNotebook = $scope.notebooks[Notebooks.getLastActiveIndex()];
+            // Grab the last active, or the first notebook
+            $scope.activeNotebook = $scope.notebooks[Notebooks.getLastActiveIndex()];
+
+            if ($scope.notebooks.length === 0) {
+                createNotebook("Main");
+            }
+        }
 
         // Called to create a new notebook
         $scope.newNotebook = function () {
@@ -210,7 +216,9 @@ angular.module('myApp.controllers', [])
         $scope.selectNotebook = function (notebook, index) {
             $scope.activeNotebook = notebook;
             Notebooks.setLastActiveIndex(index);
-            $scope.sideMenuController.close();
+            if ($scope.sideMenuController) {
+                $scope.sideMenuController.close();
+            }
         };
 
         // Create our modal
@@ -269,6 +277,8 @@ angular.module('myApp.controllers', [])
             }
             Notebooks.setActiveNoteIndex(index);
         };
+
+        init();
     })
     .controller('EditNoteCtrl', function ($scope, Notebooks) {
         $scope.activeNote = Notebooks.getActiveNote();
