@@ -187,7 +187,7 @@ angular.module('myApp.controllers', [])
 //                createNotebook(notebookTitle);
 //            }
 
-            window.navigator.notification.prompt(
+            navigator.notification.prompt(
                 "Please enter notebook name", // message
                 function(answer) {
                     if (answer.buttonIndex === 1) {
@@ -199,8 +199,7 @@ angular.module('myApp.controllers', [])
                     }
                 }, // callback
                 "New Notebook", //title
-                ["Ok", "Exit"], // button titles
-                new String() // defaultText
+                ["Ok", "Exit"] // button titles
             );
         };
 
