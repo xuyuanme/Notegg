@@ -302,6 +302,8 @@ angular.module('myApp.controllers', [])
         $scope.activeNote = Notebooks.getActiveNote();
 
         $scope.writeNote = function (item) {
-            Notebooks.writeNote(item);
+            if (item.content && item.content !== '') {
+                Notebooks.writeNote(item);
+            }
         }
     });
