@@ -14,7 +14,7 @@ var myApp = angular.module('myApp', [
     config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
         if (document.URL.indexOf('https://') !== -1 || document.URL.indexOf('http://') !== -1) {
             // if not phonegap, use html5mode
-            $locationProvider.html5Mode(true).hashPrefix('!');
+            $locationProvider.html5Mode(true);
         }
         $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
         $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl1'});

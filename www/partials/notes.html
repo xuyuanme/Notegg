@@ -9,13 +9,13 @@
                 <i class="icon ion-navicon-round"></i>
             </button>
             <h1 class="title">{{activeNotebook.title}}</h1>
-            <a class="button icon ion-plus" href="noteEdit" ng-click="setActiveNote(-1)">
+            <a class="button icon ion-plus" href="#/noteEdit" ng-click="setActiveNote(-1)">
                 New
             </a>
         </header>
         <content has-header="true" scroll="true">
             <list option-buttons="itemButtons">
-                <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="note" href="noteEdit" ng-click="setActiveNote($index)">
+                <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="note" href="#/noteEdit" ng-click="setActiveNote($index)">
                     {{note.title}}
                 </item>
             </list>
