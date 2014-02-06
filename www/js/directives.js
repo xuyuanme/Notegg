@@ -107,7 +107,6 @@ angular.module('myApp.directives', [])
                     })
                 }
                 element.bind('touchend', function (e) {
-                    window.alert(element[0]);
                     element[0].focus();
                 })
             }
