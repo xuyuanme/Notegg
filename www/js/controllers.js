@@ -199,7 +199,8 @@ angular.module('myApp.controllers', [])
                     }
                 }, // callback
                 "New Notebook", //title
-                ["Ok", "Exit"] // button titles
+                ["Ok", "Exit"], // button titles
+                new String() // defaultText
             );
         };
 
