@@ -14,8 +14,6 @@ angular.module('myApp.directives', [])
             restrict: 'A',
             require: '?ngModel',
             link: function (scope, element, attrs, ngModel) {
-                element[0].focus();
-
                 // don't do anything unless this is actually bound to a model
                 if (!ngModel) {
                     return
@@ -106,9 +104,9 @@ angular.module('myApp.directives', [])
                         }
                     })
                 }
-                element.bind('touchend', function (e) {
-                    element[0].focus();
-                })
+//                element.bind('touchend', function (e) {
+//                    element[0].focus();
+//                })
             }
         }
     }]);
