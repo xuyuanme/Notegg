@@ -111,8 +111,8 @@ angular.module('myApp.services', [])
             },
             writeNote: function (note) {
                 var notebooks = this.all();
-                window.alert(note.content.length);
-                if (note && note.content !== '' && note.content.length > 0) {
+                window.alert(note.content.trim().length);
+                if (note && note.content.trim() !== '') {
                     note.title = note.content.split('\n')[0];
                     if (activeNoteIndex === -1) {
                         notebooks[this.getLastActiveIndex()].notes.push(note);
