@@ -121,7 +121,9 @@ angular.module('myApp.services', [])
                         notebooks[this.getLastActiveIndex()].notes[activeNoteIndex] = note;
                     }
                 } else {
-                    notebooks[this.getLastActiveIndex()].notes.splice(activeNoteIndex, 1);
+                    if (activeNoteIndex !== -1) {
+                        notebooks[this.getLastActiveIndex()].notes.splice(activeNoteIndex, 1);
+                    }
                 }
                 this.save(notebooks);
             },
