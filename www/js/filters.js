@@ -10,6 +10,11 @@ angular.module('myApp.filters', []).
     }])
     .filter('firstline', function () {
         return function (text) {
-            return text.split('\n')[0];
+            var firstline = text.split('\n')[0];
+            if (firstline.length > 7) {
+                return firstline.substring(0, 7) + "...";
+            } else {
+                return firstline;
+            }
         }
     });
