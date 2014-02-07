@@ -164,8 +164,6 @@ angular.module('myApp.controllers', [])
     }])
 
     .controller('NoteCtrl', function ($scope, $ionicModal, Notebooks, $location) {
-        var notebookDeleted = false;
-
         // A utility function for creating a new notebook
         // with the given notebookTitle
         var createNotebook = function (notebookTitle) {
@@ -225,14 +223,11 @@ angular.module('myApp.controllers', [])
 
         // Called to select the given notebook
         $scope.selectNotebook = function (index, keepMenuOpen) {
-            if (!notebookDeleted) {
-                $scope.activeNotebook = $scope.notebooks[index];
-                Notebooks.setLastActiveIndex(index);
-                if ($scope.sideMenuController && !keepMenuOpen) {
-                    $scope.sideMenuController.close();
-                }
+            $scope.activeNotebook = $scope.notebooks[index];
+            Notebooks.setLastActiveIndex(index);
+            if ($scope.sideMenuController && !keepMenuOpen) {
+                $scope.sideMenuController.close();
             }
-            notebookDeleted = false;
         };
 
         // Create our modal
@@ -298,8 +293,6 @@ angular.module('myApp.controllers', [])
                     'OK,Cancel'         // buttonLabels
                 );
             }
-            // anyway, mark the notebookDeleted flag as true, so the side menu won't close
-            notebookDeleted = true;
         };
 
         $scope.setActiveNote = function (index) {
