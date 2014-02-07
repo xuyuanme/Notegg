@@ -17,7 +17,14 @@ angular.module('myApp.directives', [])
                 // if this is the first new edit, bring up the focus and keypad
                 if (scope.$parent.newEdit) {
                     element[0].focus();
+                    // prevent lose focus when content is empty
+                    element.bind('blur', function () {
+                        if (element[0].innerText === '') {
+                            element[0].focus();
+                        }
+                    });
                 }
+
                 // don't do anything unless this is actually bound to a model
                 if (!ngModel) {
                     return
