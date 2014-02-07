@@ -69,6 +69,7 @@ angular.module('myApp.services', [])
     })
     .factory('Notebooks', function () {
         var activeNoteIndex;
+        var newEdit = false;
         return {
             all: function () {
                 var notebookString = window.localStorage['notebooks'];
@@ -98,13 +99,14 @@ angular.module('myApp.services', [])
 //            },
             setActiveNoteIndex: function (index) {
                 activeNoteIndex = index;
+                newEdit = index === -1 ? true : false;
             },
 //            getActiveNoteIndex: function () {
 //                return activeNoteIndex;
 //            },
             getActiveNote: function () {
                 if (activeNoteIndex === -1) {
-                    return {title: "New Note", content: ""};
+                    return {title: "", content: ""};
                 } else {
                     return this.all()[this.getLastActiveIndex()].notes[activeNoteIndex];
                 }
@@ -122,6 +124,9 @@ angular.module('myApp.services', [])
                     notebooks[this.getLastActiveIndex()].notes.splice(activeNoteIndex, 1);
                 }
                 this.save(notebooks);
+            },
+            isNewEdit: function () {
+                return newEdit;
             }
         }
     });

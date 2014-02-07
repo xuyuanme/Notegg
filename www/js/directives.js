@@ -14,6 +14,10 @@ angular.module('myApp.directives', [])
             restrict: 'A',
             require: '?ngModel',
             link: function (scope, element, attrs, ngModel) {
+                // if this is the first new edit, bring up the focus and keypad
+                if (scope.$parent.newEdit) {
+                    element[0].focus();
+                }
                 // don't do anything unless this is actually bound to a model
                 if (!ngModel) {
                     return

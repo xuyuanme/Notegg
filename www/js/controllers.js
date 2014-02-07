@@ -316,6 +316,7 @@ angular.module('myApp.controllers', [])
         init();
     })
     .controller('EditNoteCtrl', function ($scope, Notebooks, $location) {
+        $scope.newEdit = Notebooks.isNewEdit();
         $scope.activeNote = Notebooks.getActiveNote();
 
         $scope.writeNote = function (item) {
