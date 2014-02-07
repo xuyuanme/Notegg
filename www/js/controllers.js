@@ -163,7 +163,7 @@ angular.module('myApp.controllers', [])
         }
     }])
 
-    .controller('NoteCtrl', function ($scope, $ionicModal, Notebooks) {
+    .controller('NoteCtrl', function ($scope, $ionicModal, Notebooks, $location) {
         var notebookDeleted = false;
 
         // A utility function for creating a new notebook
@@ -307,6 +307,7 @@ angular.module('myApp.controllers', [])
                 index = -1;
             }
             Notebooks.setActiveNoteIndex(index);
+            $location.path('noteEdit');
         };
 
         $scope.onReorder = function (el, oldIndex, newIndex) {
@@ -321,10 +322,15 @@ angular.module('myApp.controllers', [])
 
         init();
     })
-    .controller('EditNoteCtrl', function ($scope, Notebooks) {
+    .controller('EditNoteCtrl', function ($scope, Notebooks, $location) {
         $scope.activeNote = Notebooks.getActiveNote();
 
         $scope.writeNote = function (item) {
             Notebooks.writeNote(item);
+            $scope.goto('/');
+        };
+
+        $scope.goto = function (url) {
+            $location.path(url);
         }
     });
