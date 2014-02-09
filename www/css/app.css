@@ -53,3 +53,9 @@
     line-height: 1;
     speak: none;
 }
+
+.scroll-refresher {
+    top: 0px;
+    width: 100%;
+    position: absolute;
+}

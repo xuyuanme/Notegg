@@ -38,17 +38,10 @@
 
     <link rel="stylesheet" href="css/ionic.css">
     <link rel="stylesheet" href="css/app.css">
-    <!--https://stackoverflow.com/questions/18628073/phonegap-ios-disable-user-selection-copy-on-webview-->
-    <!--<style type="text/css">-->
-        <!--*:not(input):not(textarea) {-->
-            <!---webkit-user-select: none; /* disable selection/Copy of UIWebView */-->
-            <!---webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */-->
-        <!--}-->
-    <!--</style>-->
 </head>
 <body ng-app="myApp">
 
-<div ng-view></div>
+<div ng-view ng-controller="DropboxCtrl"></div>
 
 <script id="notes.html" type="text/ng-template">
     <side-menus>
@@ -57,33 +50,37 @@
             <header class="bar bar-header bar-positive">
                 <!--<button class="button button-icon icon ion-ios7-minus-outline"-->
                 <!--ng-click="showDelete=!showDelete"></button>-->
-                <button class="button button-icon" ng-click="toggleNotebooks()">
+                <button ng-hide="uiContainer.showSigninButton" class="button button-icon" ng-click="toggleNotebooks()">
                     <i class="icon ion-navicon-round"></i>
                 </button>
+                <button ng-show="uiContainer.showSigninButton" class="button icon ion-log-in" ng-click="authDropbox()">Sign In</button>
                 <h1 class="title">{{activeNotebook.title}}</h1>
                 <a class="button icon ion-plus" ng-click="setActiveNote(-1)" ng-if="activeNotebook">
                     New
                 </a>
             </header>
-            <content has-header="true" scroll="true">
+            <content has-header="true" has-footer="true" scroll="true" on-refresh="refreshNotebooks()">
                 <list option-buttons="itemButtons">
-                    <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="$index" ng-click="setActiveNote($index)">
+                    <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="$index"
+                          ng-click="setActiveNote($index)">
                         {{note.title}}
                     </item>
                 </list>
+
+                <refresher></refresher>
             </content>
         </pane>
 
         <!-- Left menu -->
         <side-menu side="left">
             <header class="bar bar-header bar-positive">
-                <button class="button button-icon icon ion-ios7-minus-outline"
+                <button ng-hide="uiContainer.showSigninButton" class="button button-icon icon ion-ios7-minus-outline"
                         ng-click="showDelete=!showDelete"></button>
                 <h1 class="title">Notebooks</h1>
-                <button class="button button-icon icon ion-ios7-plus-outline" ng-click="newNotebook()"></button>
+                <button ng-hide="uiContainer.showSigninButton" class="button button-icon icon ion-ios7-plus-outline" ng-click="newNotebook()"></button>
             </header>
             <content has-header="true" scroll="false">
-                <list show-delete="showDelete" on-delete="onNotebookDelete(item)" can-reorder="true" show-reorder="true"
+                <list show-delete="showDelete" on-delete="onNotebookDelete(item)" can-reorder="false" show-reorder="true"
                       reorder-icon="ion-drag" on-reorder="onReorder(el, start, end)">
                     <item ng-repeat="notebook in notebooks" ng-click="selectNotebook($index)"
                           ng-class="{active: activeNotebook == notebook}" item="$index">
@@ -99,7 +96,8 @@
     <div class="bar bar-header bar-positive">
         <a class="button button-icon icon ion-arrow-left-c" ng-click="goto('/')"></a>
 
-        <h1 class="title">{{ activeNote.content | firstline }}</h1>
+        <h1 class="title" ng-if="!activeNote.title">{{ activeNote.content | firstline }}</h1>
+        <h1 class="title" ng-if="activeNote.title">{{ activeNote.title }}</h1>
         <a class="button icon ion-checkmark-round" ng-click="writeNote(activeNote)">Commit</a>
     </div>
 

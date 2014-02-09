@@ -7,8 +7,14 @@
 // In this case it is a simple value service.
 angular.module('myApp.services', [])
     .value('version', '0.1')
-    .factory('DropBoxService', function ($q) {
+    .factory('DropboxService', function ($q, $rootScope) {
 //        console.log('init dropbox client');
+        var errorHandling = function (err) {
+            if (err) {
+                console.log(err);
+                $rootScope.$broadcast('DropboxError', err);
+            }
+        };
         var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
         if (myApp.isPhone) {
             client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: true}));
@@ -62,12 +68,74 @@ angular.module('myApp.services', [])
                     }
                 });
                 return defered.promise;
+            },
+            writeNotebook: function (notebook) {
+                var dir = notebook.title;
+                for (var i in notebook.notes) {
+                    client.writeFile(dir + '/' + notebook.notes[i].title.substring(0, 10) + '.txt', notebook.notes[i].content, function (err) {
+                        errorHandling(err);
+                    });
+                }
+            },
+            readNotebooks: function (fn) {
+                var notebooks = [];
+                client.readdir('/', function (err, d1, d2, folders) {
+                    if (err) {
+                        errorHandling(err);
+                    } else {
+                        for (var i in folders) {
+                            (function (i) {
+                                if (folders[i].isFolder) {
+                                    var notebook = {title: '', notes: []};
+                                    notebook.title = folders[i].name;
+                                    client.readdir('/' + folders[i].name, function (err, d1, d2, files) {
+                                        if (err) {
+                                            errorHandling(err);
+                                        } else {
+                                            for (var j in files) {
+                                                (function (j) {
+                                                    var temp = files[j].name.split('.');
+                                                    if (files[j].isFile && temp.length > 1 && temp[temp.length - 1] === "txt") {
+                                                        var note = {title: '', content: ''};
+                                                        temp.splice(temp.length - 1, 1);
+                                                        note.title = temp.join('.');
+                                                        client.readFile(files[j].path, function (err, data) {
+                                                            if (err) {
+                                                                errorHandling(err);
+                                                            } else {
+//                                                    note.title = data.split('\n')[0].substring(0, 10);
+                                                                note.content = data;
+                                                                fn(notebooks);
+                                                            }
+                                                        });
+                                                        notebook.notes.push(note);
+                                                    }
+                                                }(j));
+                                            }
+                                        }
+                                    });
+                                    notebooks.push(notebook);
+                                }
+                            }(i));
+                        }
+                    }
+                });
+            },
+            remove: function (path) {
+                client.remove(path, function (err) {
+                    errorHandling(err);
+                });
+            },
+            mkdir: function (path) {
+                client.mkdir(path, function (err) {
+                    errorHandling(err);
+                });
             }
         };
 
         return service;
     })
-    .factory('Notebooks', function () {
+    .factory('NotebookService', function (DropboxService) {
         var activeNoteIndex;
         var newEdit = false;
         return {
@@ -78,8 +146,13 @@ angular.module('myApp.services', [])
                 }
                 return [];
             },
-            save: function (notebooks) {
+            save: function (notebooks, skipDropbox) {
                 window.localStorage['notebooks'] = angular.toJson(notebooks);
+                if (!skipDropbox) {
+                    for (var i in notebooks) {
+                        DropboxService.writeNotebook(notebooks[i]);
+                    }
+                }
             },
             newNotebook: function (notebookTitle) {
                 // Add a new project
@@ -114,7 +187,9 @@ angular.module('myApp.services', [])
             writeNote: function (note) {
                 var notebooks = this.all();
                 if (note && note.content.trim() !== '') {
-                    note.title = note.content.split('\n')[0];
+                    if (!note.title) {
+                        note.title = note.content.split('\n')[0];
+                    }
                     if (activeNoteIndex === -1) {
                         notebooks[this.getLastActiveIndex()].notes.push(note);
                     } else {
@@ -129,6 +204,9 @@ angular.module('myApp.services', [])
             },
             isNewEdit: function () {
                 return newEdit;
+            },
+            readNotebooks: function (fn) {
+                DropboxService.readNotebooks(fn);
             }
         }
     });

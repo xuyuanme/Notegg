@@ -3,21 +3,25 @@
 /* Controllers */
 
 angular.module('myApp.controllers', [])
-    .controller('MyCtrl', ['$scope', '$location', 'DropBoxService', function ($scope, $location, DropBoxService) {
+    .controller('DropboxCtrl', ['$scope', '$location', 'DropboxService', function ($scope, $location, DropboxService) {
 
         $scope.init = function () {
             $scope.log('init MyCtrl');
             $scope.notesContainer = {notes: ''};
             $scope.uiContainer = {showSigninButton: false, showWaitingBar: true};
-            if (!DropBoxService.isAuthenticated()) {
+            if (!DropboxService.isAuthenticated()) {
                 $scope.log('reset dropbox client');
-                DropBoxService.reset();
+                DropboxService.reset();
                 $scope.resetUI();
             } else {
                 $scope.show();
                 $scope.authDropbox(false);
             }
-        }
+            $scope.$on('DropboxError', function (event, err) {
+                $scope.resetUI();
+                $scope.$apply();
+            });
+        };
 
         $scope.goto = function (value) {
             $location.path(value);
@@ -63,9 +67,9 @@ angular.module('myApp.controllers', [])
             }
             if (interactive) {
                 // if it's active auth triggered by user, means sth is wrong, reset first
-                DropBoxService.reset();
+                DropboxService.reset();
             }
-            DropBoxService.authenticate({interactive: interactive}, function (err, client) {
+            DropboxService.authenticate({interactive: interactive}, function (err, client) {
                 $scope.log('auth with interactive: ' + interactive);
                 if (err) {
                     $scope.error('auth err: ' + err);
@@ -78,7 +82,7 @@ angular.module('myApp.controllers', [])
                         if (myApp.isPhone) {
                             $scope.$apply();
                         }
-                        $scope.readNotes();
+//                        $scope.readNotes();
                         $scope.log('sent read notes request');
                     } else {
                         $scope.error('client not authenticated');
@@ -90,8 +94,8 @@ angular.module('myApp.controllers', [])
 
         $scope.readNotes = function () {
             $scope.log('start read notes');
-            // $scope.notes = DropBoxService.readNotes();
-            DropBoxService.readNotes().then(function (result) {
+            // $scope.notes = DropboxService.readNotes();
+            DropboxService.readNotes().then(function (result) {
                 $scope.versionTag = result.stat.versionTag;
                 $scope.notesContainer.notes = result.data;
                 $scope.uiContainer.showWaitingBar = false;
@@ -102,7 +106,7 @@ angular.module('myApp.controllers', [])
                 $scope.error('read notes promise get error: ' + err);
                 if (err.status === Dropbox.ApiError.INVALID_TOKEN) {
                     $scope.log('reset dropbox client');
-                    DropBoxService.reset();
+                    DropboxService.reset();
                     $scope.resetUI();
                 } else if (err.status === Dropbox.ApiError.NOT_FOUND) {
 //                    $scope.writeNotes();
@@ -120,7 +124,7 @@ angular.module('myApp.controllers', [])
             if ($scope.notesContainer.notes === '') {
                 $scope.notesContainer.notes = "Write your first note here";
             }
-            DropBoxService.writeNotes($scope.notesContainer.notes, {lastVersionTag: $scope.versionTag}).then(function (stat) {
+            DropboxService.writeNotes($scope.notesContainer.notes, {lastVersionTag: $scope.versionTag}).then(function (stat) {
                 $scope.versionTag = stat.versionTag;
                 $scope.hide();
                 $scope.log('write notes successful');
@@ -128,7 +132,7 @@ angular.module('myApp.controllers', [])
                 $scope.error('write notes error for versionTag ' + $scope.versionTag + ': ' + err);
                 $scope.resetUI();
             }
-        }
+        };
 
         $scope.resetUI = function () {
             $scope.log('reset ui');
@@ -150,7 +154,7 @@ angular.module('myApp.controllers', [])
 
         $scope.onRefresh = function () {
             $scope.authDropbox(false);
-        }
+        };
 
         $scope.init();
     }])
@@ -163,37 +167,40 @@ angular.module('myApp.controllers', [])
         }
     }])
 
-    .controller('NoteCtrl', function ($scope, $ionicModal, Notebooks, $location) {
+    .controller('NoteCtrl', function ($scope, $ionicModal, NotebookService, $location, DropboxService) {
         // A utility function for creating a new notebook
         // with the given notebookTitle
         var createNotebook = function (notebookTitle) {
-            var newNotebook = Notebooks.newNotebook(notebookTitle);
+            var newNotebook = NotebookService.newNotebook(notebookTitle);
             $scope.notebooks.push(newNotebook);
-            Notebooks.save($scope.notebooks);
+            NotebookService.save($scope.notebooks, true);
+            DropboxService.mkdir('/' + notebookTitle);
             $scope.selectNotebook($scope.notebooks.length - 1);
-        }
+        };
 
         var deleteNotebook = function (item) {
+            DropboxService.remove($scope.notebooks[item].title);
             $scope.notebooks.splice(item, 1);
             if ($scope.notebooks.length === 0) {
                 $scope.activeNotebook = null;
-            } else if (Notebooks.getLastActiveIndex() === item) {
+            } else if (NotebookService.getLastActiveIndex() === item) {
                 $scope.selectNotebook(0, true);
             }
-            Notebooks.save($scope.notebooks);
-        }
+            NotebookService.save($scope.notebooks, true);
+        };
 
         var init = function () {
             // Load or initialize notebooks
-            $scope.notebooks = Notebooks.all();
+            $scope.notebooks = NotebookService.all();
+            $scope.refreshNotebooks();
 
             // Grab the last active, or the first notebook
-            $scope.activeNotebook = $scope.notebooks[Notebooks.getLastActiveIndex()];
+            $scope.activeNotebook = $scope.notebooks[NotebookService.getLastActiveIndex()];
 
             if ($scope.notebooks.length === 0) {
                 createNotebook("Main");
             }
-        }
+        };
 
         // Called to create a new notebook
         $scope.newNotebook = function () {
@@ -216,7 +223,7 @@ angular.module('myApp.controllers', [])
                     }, // callback
                     "New Notebook", //title
                     ["Cancel", "OK"], // button titles
-                    new String() // defaultText
+                    "" // defaultText
                 );
             }
         };
@@ -224,7 +231,7 @@ angular.module('myApp.controllers', [])
         // Called to select the given notebook
         $scope.selectNotebook = function (index, keepMenuOpen) {
             $scope.activeNotebook = $scope.notebooks[index];
-            Notebooks.setLastActiveIndex(index);
+            NotebookService.setLastActiveIndex(index);
             if ($scope.sideMenuController && !keepMenuOpen) {
                 $scope.sideMenuController.close();
             }
@@ -247,7 +254,7 @@ angular.module('myApp.controllers', [])
             $scope.noteModal.hide();
 
             // Inefficient, but save all the notebooks
-            Notebooks.save($scope.notebooks);
+            NotebookService.save($scope.notebooks);
 
             note.title = "";
         };
@@ -258,7 +265,7 @@ angular.module('myApp.controllers', [])
 
         $scope.closeNewNote = function () {
             $scope.noteModal.hide();
-        }
+        };
 
         $scope.toggleNotebooks = function () {
             $scope.sideMenuController.toggleLeft();
@@ -269,8 +276,9 @@ angular.module('myApp.controllers', [])
                 text: 'Delete',
                 type: 'button-assertive',
                 onTap: function (item) {
+                    DropboxService.remove($scope.activeNotebook.title + '/' + $scope.activeNotebook.notes[item].title + '.txt');
                     $scope.activeNotebook.notes.splice(item, 1);
-                    Notebooks.save($scope.notebooks);
+                    NotebookService.save($scope.notebooks, true);
                 }
             }
         ];
@@ -299,7 +307,7 @@ angular.module('myApp.controllers', [])
             if (index === undefined) {
                 index = -1;
             }
-            Notebooks.setActiveNoteIndex(index);
+            NotebookService.setActiveNoteIndex(index);
             $location.path('noteEdit');
         };
 
@@ -310,17 +318,31 @@ angular.module('myApp.controllers', [])
                 $scope.notebooks[oldIndex] = tempNode;
                 tempNode = null;
             }
-            Notebooks.save($scope.notebooks);
+            NotebookService.save($scope.notebooks);
+        };
+
+        $scope.refreshModel = function (notebooks) {
+            $scope.notebooks = notebooks;
+            $scope.activeNotebook = notebooks[NotebookService.getLastActiveIndex()];
+            NotebookService.save($scope.notebooks, true);
         }
+
+        $scope.refreshNotebooks = function () {
+            NotebookService.readNotebooks(function (data) {
+                $scope.refreshModel(data);
+                $scope.$apply();
+            });
+            $scope.$broadcast('scroll.refreshComplete');
+        };
 
         init();
     })
-    .controller('EditNoteCtrl', function ($scope, Notebooks, $location) {
-        $scope.newEdit = Notebooks.isNewEdit();
-        $scope.activeNote = Notebooks.getActiveNote();
+    .controller('EditNoteCtrl', function ($scope, NotebookService, $location) {
+        $scope.newEdit = NotebookService.isNewEdit();
+        $scope.activeNote = NotebookService.getActiveNote();
 
         $scope.writeNote = function (item) {
-            Notebooks.writeNote(item);
+            NotebookService.writeNote(item);
             $scope.goto('/');
         };
 
