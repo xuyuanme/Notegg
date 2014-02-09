@@ -192,6 +192,8 @@ angular.module('myApp.controllers', [])
         var init = function () {
             // Load or initialize notebooks
             $scope.notebooks = NotebookService.all();
+            // should save first in case lost data on mobile app
+//            NotebookService.save($scope.notebooks); // wrong, should do it in sync way
             $scope.refreshNotebooks();
 
             // Grab the last active, or the first notebook
@@ -223,7 +225,7 @@ angular.module('myApp.controllers', [])
                     }, // callback
                     "New Notebook", //title
                     ["Cancel", "OK"], // button titles
-                    "" // defaultText
+                    new String() // defaultText
                 );
             }
         };
@@ -243,21 +245,6 @@ angular.module('myApp.controllers', [])
         }, {
             scope: $scope
         });
-
-        $scope.createNote = function (note) {
-            if (!$scope.activeNotebook) {
-                return;
-            }
-            $scope.activeNotebook.notes.push({
-                title: note.title
-            });
-            $scope.noteModal.hide();
-
-            // Inefficient, but save all the notebooks
-            NotebookService.save($scope.notebooks);
-
-            note.title = "";
-        };
 
         $scope.newNote = function () {
             $scope.noteModal.show();

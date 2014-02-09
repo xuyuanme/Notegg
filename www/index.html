@@ -53,13 +53,15 @@
                 <button ng-hide="uiContainer.showSigninButton" class="button button-icon" ng-click="toggleNotebooks()">
                     <i class="icon ion-navicon-round"></i>
                 </button>
-                <button ng-show="uiContainer.showSigninButton" class="button icon ion-log-in" ng-click="authDropbox()">Sign In</button>
+                <button ng-show="uiContainer.showSigninButton" class="button icon ion-log-in" ng-click="authDropbox()">
+                    Sign In
+                </button>
                 <h1 class="title">{{activeNotebook.title}}</h1>
                 <a class="button icon ion-plus" ng-click="setActiveNote(-1)" ng-if="activeNotebook">
                     New
                 </a>
             </header>
-            <content has-header="true" has-footer="true" scroll="true" on-refresh="refreshNotebooks()">
+            <content has-header="true" has-footer="false" scroll="true" on-refresh="refreshNotebooks()">
                 <list option-buttons="itemButtons">
                     <item class="arrowList" ng-repeat="note in activeNotebook.notes" item="$index"
                           ng-click="setActiveNote($index)">
@@ -77,10 +79,12 @@
                 <button ng-hide="uiContainer.showSigninButton" class="button button-icon icon ion-ios7-minus-outline"
                         ng-click="showDelete=!showDelete"></button>
                 <h1 class="title">Notebooks</h1>
-                <button ng-hide="uiContainer.showSigninButton" class="button button-icon icon ion-ios7-plus-outline" ng-click="newNotebook()"></button>
+                <button ng-hide="uiContainer.showSigninButton" class="button button-icon icon ion-ios7-plus-outline"
+                        ng-click="newNotebook()"></button>
             </header>
             <content has-header="true" scroll="false">
-                <list show-delete="showDelete" on-delete="onNotebookDelete(item)" can-reorder="false" show-reorder="true"
+                <list show-delete="showDelete" on-delete="onNotebookDelete(item)" can-reorder="false"
+                      show-reorder="true"
                       reorder-icon="ion-drag" on-reorder="onReorder(el, start, end)">
                     <item ng-repeat="notebook in notebooks" ng-click="selectNotebook($index)"
                           ng-class="{active: activeNotebook == notebook}" item="$index">
@@ -97,6 +101,7 @@
         <a class="button button-icon icon ion-arrow-left-c" ng-click="goto('/')"></a>
 
         <h1 class="title" ng-if="!activeNote.title">{{ activeNote.content | firstline }}</h1>
+
         <h1 class="title" ng-if="activeNote.title">{{ activeNote.title }}</h1>
         <a class="button icon ion-checkmark-round" ng-click="writeNote(activeNote)">Commit</a>
     </div>
@@ -107,11 +112,7 @@
             has-footer="false"
             scroll="true"
             overflow-scroll="true"
-            on-refresh="onRefresh()"
             >
-
-        <!-- for pull to refresh -->
-        <refresher></refresher>
 
         <!-- content -->
         <div class="newline notepad" contenteditable="true" plain-text="true" ng-model="activeNote.content"></div>
