@@ -72,7 +72,7 @@ angular.module('myApp.services', [])
             writeNotebook: function (notebook) {
                 var dir = notebook.title;
                 for (var i in notebook.notes) {
-                    client.writeFile(dir + '/' + notebook.notes[i].title.substring(0, 10) + '.txt', notebook.notes[i].content, function (err) {
+                    client.writeFile(dir + '/' + notebook.notes[i].title + '.txt', notebook.notes[i].content, {lastVersionTag: notebook.notes[i].versionTag}, function (err) {
                         errorHandling(err);
                     });
                 }
@@ -96,15 +96,16 @@ angular.module('myApp.services', [])
                                                 (function (j) {
                                                     var temp = files[j].name.split('.');
                                                     if (files[j].isFile && temp.length > 1 && temp[temp.length - 1] === "txt") {
-                                                        var note = {title: '', content: ''};
+                                                        var note = {title: '', content: '', versionTag: ''};
                                                         temp.splice(temp.length - 1, 1);
                                                         note.title = temp.join('.');
-                                                        client.readFile(files[j].path, function (err, data) {
+                                                        client.readFile(files[j].path, function (err, data, stat) {
                                                             if (err) {
                                                                 errorHandling(err);
                                                             } else {
 //                                                    note.title = data.split('\n')[0].substring(0, 10);
                                                                 note.content = data;
+                                                                note.versionTag = stat.versionTag;
                                                                 fn(notebooks);
                                                             }
                                                         });
