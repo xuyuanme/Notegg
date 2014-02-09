@@ -194,7 +194,9 @@ angular.module('myApp.controllers', [])
             $scope.notebooks = NotebookService.all();
             // should save first in case lost data on mobile app
 //            NotebookService.save($scope.notebooks); // wrong, should do it in sync way
-            $scope.refreshNotebooks();
+            document.addEventListener("resume", function () {
+                $scope.refreshNotebooks();
+            }, false);
 
             // Grab the last active, or the first notebook
             $scope.activeNotebook = $scope.notebooks[NotebookService.getLastActiveIndex()];
