@@ -73,6 +73,11 @@ angular.module('myApp.services', [])
                 var dir = notebook.title;
                 for (var i in notebook.notes) {
                     client.writeFile(dir + '/' + notebook.notes[i].title + '.txt', notebook.notes[i].content, {lastVersionTag: notebook.notes[i].versionTag}, function (err) {
+                        this.saveDraft({
+                            title: notebook.notes[i].title,
+                            content: notebook.notes[i].content,
+                            versionTag: notebook.notes[i].versionTag,
+                            path: dir + '/' + notebook.notes[i].title + '.txt'});
                         errorHandling(err);
                     });
                 }
@@ -106,16 +111,16 @@ angular.module('myApp.services', [])
 //                                                    note.title = data.split('\n')[0].substring(0, 10);
                                                                 note.content = data;
                                                                 note.versionTag = stat.versionTag;
+                                                                notebook.notes.push(note);
                                                                 fn(notebooks);
                                                             }
                                                         });
-                                                        notebook.notes.push(note);
                                                     }
                                                 }(j));
                                             }
+                                            notebooks.push(notebook);
                                         }
                                     });
-                                    notebooks.push(notebook);
                                 }
                             }(i));
                         }
@@ -131,6 +136,16 @@ angular.module('myApp.services', [])
                 client.mkdir(path, function (err) {
                     errorHandling(err);
                 });
+            },
+            getDraftNotebook: function () {
+                var notebookString = window.localStorage['drafts_notebook'];
+                if (notebookString) {
+                    return angular.fromJson(notebookString);
+                }
+                return {title: '_draft', notes: []};
+            },
+            saveDraft: function (draft) {
+                window.localStorage['drafts_notebook'] = angular.toJson(this.getDraftNotebook().notes.push(draft));
             }
         };
 
@@ -151,7 +166,9 @@ angular.module('myApp.services', [])
                 window.localStorage['notebooks'] = angular.toJson(notebooks);
                 if (!skipDropbox) {
                     for (var i in notebooks) {
-                        DropboxService.writeNotebook(notebooks[i]);
+                        if (notebooks[i].title !== '_draft') {
+                            DropboxService.writeNotebook(notebooks[i]);
+                        }
                     }
                 }
             },
