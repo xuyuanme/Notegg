@@ -58,11 +58,12 @@ angular.module('myApp.services', [])
                 });
                 return defered.promise;
             },
-            writeNotes: function (data, options) {
+            writeNote: function (dir, note) {
                 var defered = $q.defer();
-                client.writeFile('notes.txt', data, options, function (err, stat) {
+                client.writeFile(dir + '/' + note.title + '.txt', note.content, {lastVersionTag: note.versionTag}, function (err, stat) {
                     if (err) {
-                        defered.reject(err);
+                        note.dir = dir;
+                        defered.reject(note);
                     } else {
                         defered.resolve(stat);
                     }
@@ -71,15 +72,16 @@ angular.module('myApp.services', [])
             },
             writeNotebook: function (notebook) {
                 var dir = notebook.title;
+                var that = this;
                 for (var i in notebook.notes) {
-                    client.writeFile(dir + '/' + notebook.notes[i].title + '.txt', notebook.notes[i].content, {lastVersionTag: notebook.notes[i].versionTag}, function (err) {
-                        this.saveDraft({
-                            title: notebook.notes[i].title,
-                            content: notebook.notes[i].content,
-                            versionTag: notebook.notes[i].versionTag,
-                            path: dir + '/' + notebook.notes[i].title + '.txt'});
-                        errorHandling(err);
-                    });
+                    if (notebook.notes[i].isChanged) {
+                        this.writeNote(dir, notebook.notes[i]).then(function (stat) {
+                            // TODO update version tag
+                        }, function (rejectNote) {
+                            console.log('copy reject note ' + rejectNote.title + ' to _draft box');
+                            that.saveDraft(rejectNote);
+                        });
+                    }
                 }
             },
             readNotebooks: function (fn) {
@@ -145,7 +147,9 @@ angular.module('myApp.services', [])
                 return {title: '_draft', notes: []};
             },
             saveDraft: function (draft) {
-                window.localStorage['drafts_notebook'] = angular.toJson(this.getDraftNotebook().notes.push(draft));
+                var draftNotebook = this.getDraftNotebook();
+                draftNotebook.notes.push(draft);
+                window.localStorage['drafts_notebook'] = angular.toJson(draftNotebook);
             }
         };
 
@@ -158,7 +162,12 @@ angular.module('myApp.services', [])
             all: function () {
                 var notebookString = window.localStorage['notebooks'];
                 if (notebookString) {
-                    return angular.fromJson(notebookString);
+                    var notebooks = angular.fromJson(notebookString);
+                    if (DropboxService.getDraftNotebook().notes.length > 0) {
+                        notebooks.push(DropboxService.getDraftNotebook());
+                    }
+                    return notebooks;
+//                    return angular.fromJson(notebookString);
                 }
                 return [];
             },
@@ -205,6 +214,7 @@ angular.module('myApp.services', [])
             writeNote: function (note) {
                 var notebooks = this.all();
                 if (note && note.content.trim() !== '') {
+                    note.isChanged = true;
                     if (!note.title) {
                         note.title = note.content.split('\n')[0];
                     }

@@ -312,9 +312,6 @@ angular.module('myApp.controllers', [])
 
         $scope.refreshModel = function (notebooks) {
             $scope.notebooks = notebooks;
-            if (DropboxService.getDraftNotebook().notes.length > 0) {
-                $scope.notebooks.push(DropboxService.getDraftNotebook());
-            }
             $scope.activeNotebook = notebooks[NotebookService.getLastActiveIndex()];
             NotebookService.save($scope.notebooks, true);
         };
