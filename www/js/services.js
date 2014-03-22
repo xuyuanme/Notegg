@@ -44,16 +44,77 @@ angular.module('myApp.services', [])
 //                console.log('client reset');
                 client.reset();
             },
-            readNotes: function () {
-//                console.log('start read notes');
+            readNote: function (path) {
+                console.log('start read note ' + path);
                 var defered = $q.defer();
-                client.readFile("notes.txt", function (err, data, stat, range) {
+                client.readFile(path, function (err, data, stat, range) {
                     if (err) {
-//                        console.log('read notes err: ' + err);
+                        console.log('read note err: ' + err);
                         defered.reject(err);
                     } else {
-//                        console.log('read notes resolved');
-                        defered.resolve({data: data, stat: stat, range: range});
+                        var title = path.replace(/.*\//, '').replace(/\.\w*$/, ''); // replace '/a.a/b.b/e.e.txt' to 'e.e'
+                        console.log('read note ' + title + ' resolved');
+                        defered.resolve({title: title, content: data, versionTag: stat.versionTag});
+                    }
+                });
+                return defered.promise;
+            },
+            readNotebook: function (path) {
+                console.log('start read notebook ' + path);
+                var defered = $q.defer();
+                var promises = [];
+                var that = this;
+
+                var title = path.replace(/^\//, ''); // replace '/main' to 'main'
+                console.log('Notebook title: ' + title);
+
+                client.readdir(path, function (err, d1, d2, files) {
+                    if (err) {
+                        console.log('read notebook err: ' + err);
+                        defered.reject(err);
+                    } else {
+                        for (var i in files) {
+                            (function (i) {
+                                var temp = files[i].name.split('.');
+                                if (files[i].isFile && temp.length > 1 && temp[temp.length - 1] === "txt") {
+                                    promises.push(that.readNote(files[i].path).then(function (note) {
+                                        return note;
+                                    }));
+                                }
+                            }(i));
+                        }
+                        defered.resolve($q.all(promises).then(function (notes) {
+                            console.log('all notes for notebook ' + title + ' resolved');
+                            return {title: title, notes: notes};
+                        }));
+                    }
+                });
+                return defered.promise;
+            },
+            readNotebooks: function () {
+                console.log('start read notebooks');
+                var defered = $q.defer();
+                var promises = [];
+                var that = this;
+
+                client.readdir('/', function (err, d1, d2, folders) {
+                    if (err) {
+                        console.log('read notebooks err: ' + err);
+                        defered.reject(err);
+                    } else {
+                        for (var i in folders) {
+                            (function (i) {
+                                if (folders[i].isFolder) {
+                                    promises.push(that.readNotebook('/' + folders[i].name).then(function (notebook) {
+                                        return notebook
+                                    }));
+                                }
+                            }(i));
+                        }
+                        defered.resolve($q.all(promises).then(function (notebooks) {
+                            console.log('all notebooks resolved');
+                            return notebooks
+                        }));
                     }
                 });
                 return defered.promise;
@@ -83,51 +144,6 @@ angular.module('myApp.services', [])
                         });
                     }
                 }
-            },
-            readNotebooks: function (fn) {
-                var notebooks = [];
-                client.readdir('/', function (err, d1, d2, folders) {
-                    if (err) {
-                        errorHandling(err);
-                    } else {
-                        for (var i in folders) {
-                            (function (i) {
-                                if (folders[i].isFolder) {
-                                    var notebook = {title: '', notes: []};
-                                    notebook.title = folders[i].name;
-                                    client.readdir('/' + folders[i].name, function (err, d1, d2, files) {
-                                        if (err) {
-                                            errorHandling(err);
-                                        } else {
-                                            for (var j in files) {
-                                                (function (j) {
-                                                    var temp = files[j].name.split('.');
-                                                    if (files[j].isFile && temp.length > 1 && temp[temp.length - 1] === "txt") {
-                                                        var note = {title: '', content: '', versionTag: ''};
-                                                        temp.splice(temp.length - 1, 1);
-                                                        note.title = temp.join('.');
-                                                        client.readFile(files[j].path, function (err, data, stat) {
-                                                            if (err) {
-                                                                errorHandling(err);
-                                                            } else {
-//                                                    note.title = data.split('\n')[0].substring(0, 10);
-                                                                note.content = data;
-                                                                note.versionTag = stat.versionTag;
-                                                                notebook.notes.push(note);
-                                                                fn(notebooks);
-                                                            }
-                                                        });
-                                                    }
-                                                }(j));
-                                            }
-                                            notebooks.push(notebook);
-                                        }
-                                    });
-                                }
-                            }(i));
-                        }
-                    }
-                });
             },
             remove: function (path) {
                 client.remove(path, function (err) {
@@ -234,7 +250,11 @@ angular.module('myApp.services', [])
                 return newEdit;
             },
             readNotebooks: function (fn) {
-                DropboxService.readNotebooks(fn);
+                DropboxService.readNotebooks().then(function (notebooks) {
+                    console.log('read notebooks done');
+                    console.log(notebooks);
+                    fn(notebooks);
+                });
             }
         }
     });

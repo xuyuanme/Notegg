@@ -317,8 +317,8 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.refreshNotebooks = function () {
-            NotebookService.readNotebooks(function (data) {
-                $scope.refreshModel(data);
+            NotebookService.readNotebooks(function (notebooks) {
+                $scope.refreshModel(notebooks);
                 $scope.$apply();
             });
             $scope.$broadcast('scroll.refreshComplete');
