@@ -83,10 +83,12 @@ angular.module('myApp.services', [])
                                 }
                             }(i));
                         }
-                        defered.resolve($q.all(promises).then(function (notes) {
+                        $q.all(promises).then(function (notes) {
                             console.log('all notes for notebook ' + title + ' resolved');
-                            return {title: title, notes: notes};
-                        }));
+                            defered.resolve({title: title, notes: notes});
+                        }, function (err) {
+                            defered.reject(err);
+                        });
                     }
                 });
                 return defered.promise;
@@ -111,10 +113,12 @@ angular.module('myApp.services', [])
                                 }
                             }(i));
                         }
-                        defered.resolve($q.all(promises).then(function (notebooks) {
+                        $q.all(promises).then(function (notebooks) {
                             console.log('all notebooks resolved');
-                            return notebooks
-                        }));
+                            defered.resolve(notebooks);
+                        }, function (err) {
+                            defered.reject(err);
+                        });
                     }
                 });
                 return defered.promise;
@@ -253,7 +257,9 @@ angular.module('myApp.services', [])
                 DropboxService.readNotebooks().then(function (notebooks) {
                     console.log('read notebooks done');
                     console.log(notebooks);
-                    fn(notebooks);
+                    fn(null, notebooks);
+                }, function (err) {
+                    fn(err);
                 });
             }
         }

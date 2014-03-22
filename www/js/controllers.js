@@ -317,9 +317,13 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.refreshNotebooks = function () {
-            NotebookService.readNotebooks(function (notebooks) {
-                $scope.refreshModel(notebooks);
-                $scope.$apply();
+            NotebookService.readNotebooks(function (err, notebooks) {
+                if (err) {
+                    console.log('ERROR: ' + err);
+                } else {
+                    $scope.refreshModel(notebooks);
+                    $scope.$apply();
+                }
             });
             $scope.$broadcast('scroll.refreshComplete');
         };
