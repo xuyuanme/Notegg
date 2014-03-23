@@ -320,6 +320,8 @@ angular.module('myApp.controllers', [])
             NotebookService.readNotebooks(function (err, notebooks) {
                 if (err) {
                     console.log('ERROR: ' + err);
+                    $scope.toast = {message: err};
+                    showToast();
                 } else {
                     $scope.refreshModel(notebooks);
                     $scope.$apply();

@@ -59,3 +59,23 @@
     width: 100%;
     position: absolute;
 }
+
+#toast{
+    position: fixed;
+    top: 40%;
+    width: 96%;
+    margin-left: 2%;
+    border: 1px solid #666;
+    background-color: lightcoral;
+    padding: 10px 0 ;
+    text-align:center;
+    opacity: .9;
+    z-index: 999;
+
+    /*The good stuff */
+    -webkit-transition: opacity 0.5s ease-out;  /* Saf3.2+, Chrome */
+    -moz-transition: opacity 0.5s ease-out;  /* FF4+ */
+    -ms-transition: opacity 0.5s ease-out;  /* IE10? */
+    -o-transition: opacity 0.5s ease-out;  /* Opera 10.5+ */
+    transition: opacity 0.5s ease-out;
+}

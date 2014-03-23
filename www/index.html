@@ -19,6 +19,21 @@
 //            }
         }
     </script>
+
+    <script type="text/javascript">
+        var intervalCounter = 0;
+        function hideToast() {
+            var alert = document.getElementById("toast");
+            alert.style.opacity = 0;
+            clearInterval(intervalCounter);
+        }
+        function showToast() {
+            var alert = document.getElementById("toast");
+            alert.style.opacity = .9;
+            intervalCounter = setInterval("hideToast()", 5000);
+        }
+    </script>
+
     <script src="cordova.js"></script>
     <script src="lib/dropbox/dropbox.min.js"></script>
     <script src="lib/angular/angular.js"></script>
@@ -68,7 +83,7 @@
                         {{note.title}}
                     </item>
                 </list>
-
+                <div id="toast" style="opacity: 0;">{{toast.message}}</div>
                 <refresher></refresher>
             </content>
         </pane>
