@@ -322,12 +322,13 @@ angular.module('myApp.controllers', [])
                     console.log('ERROR: ' + err);
                     $scope.toast = {message: err};
                     showToast();
+                    $scope.$broadcast('scroll.refreshComplete');
                 } else {
                     $scope.refreshModel(notebooks);
                     $scope.$apply();
+                    $scope.$broadcast('scroll.refreshComplete');
                 }
             });
-            $scope.$broadcast('scroll.refreshComplete');
         };
 
         init();
