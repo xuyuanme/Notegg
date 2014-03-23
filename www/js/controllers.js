@@ -311,16 +311,17 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.refreshModel = function (notebooks) {
-            $scope.notebooks = notebooks;
+            NotebookService.save(notebooks, true);
+            $scope.notebooks = NotebookService.all();
             $scope.activeNotebook = notebooks[NotebookService.getLastActiveIndex()];
-            NotebookService.save($scope.notebooks, true);
         };
 
         $scope.refreshNotebooks = function () {
             NotebookService.readNotebooks(function (err, notebooks) {
                 if (err) {
                     console.log('ERROR: ' + err);
-                    $scope.toast = {message: err};
+                    // TODO show toast popup for every error message
+                    $scope.toast = {message: 'ERROR: ' + err};
                     showToast();
                     $scope.$broadcast('scroll.refreshComplete');
                 } else {
