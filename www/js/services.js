@@ -114,7 +114,7 @@ angular.module('myApp.services', [])
                             }(i));
                         }
                         $q.all(promises).then(function (notebooks) {
-                            console.log('all notebooks resolved');
+                            console.log('all notebooks read successful');
                             defered.resolve(notebooks);
                         }, function (err) {
                             defered.reject(err);
@@ -124,6 +124,7 @@ angular.module('myApp.services', [])
                 return defered.promise;
             },
             writeNote: function (dir, note) {
+                console.log('[' + dir + '] start to write note ' + note.title);
                 var defered = $q.defer();
                 client.writeFile(dir + '/' + note.title + '.txt', note.content, {lastVersionTag: note.versionTag}, function (err, stat) {
                     if (err) {
@@ -136,18 +137,61 @@ angular.module('myApp.services', [])
                 return defered.promise;
             },
             writeNotebook: function (notebook) {
-                var dir = notebook.title;
+                console.log('start to write notebook ' + notebook.title);
+                var defered = $q.defer();
+                var promises = [];
                 var that = this;
+                var dir = notebook.title;
                 for (var i in notebook.notes) {
-                    if (notebook.notes[i].isChanged) {
-                        this.writeNote(dir, notebook.notes[i]).then(function (stat) {
-                            // TODO update version tag
-                        }, function (rejectNote) {
-                            console.log('copy reject note ' + rejectNote.title + ' to _draft box');
-                            that.saveDraft(rejectNote);
-                        });
-                    }
+                    (function (i) {
+                        if (notebook.notes[i].isChanged) {
+                            promises.push(that.writeNote(dir, notebook.notes[i]).then(function (stat) {
+                                notebook.notes[i].versionTag = stat.versionTag;
+                                return notebook.notes[i];
+                            }, function (rejectNote) {
+                                console.log('copy reject note ' + rejectNote.title + ' to _draft box');
+                                that.saveDraft(rejectNote);
+                            }));
+                        } else {
+                            promises.push($q.when(notebook.notes[i]).then(function (note) {
+                                return note;
+                            }));
+                        }
+                    }(i));
                 }
+
+                $q.all(promises).then(function (notes) {
+                    console.log('all notes for ' + notebook.title + ' wrote successful');
+                    defered.resolve({title: notebook.title, notes: notes});
+                }, function (err) {
+                    defered.reject(err);
+                });
+
+                return defered.promise;
+            },
+            writeNotebooks: function (notebooks) {
+                console.log('start write notebooks');
+                var defered = $q.defer();
+                var promises = [];
+                var that = this;
+
+                for (var i in notebooks) {
+                    (function (i) {
+                        if (notebooks[i].title !== '_draft') {
+                            promises.push(that.writeNotebook(notebooks[i]).then(function (notebook) {
+                                return notebook
+                            }));
+                        }
+                    }(i));
+                }
+
+                $q.all(promises).then(function (notebooks) {
+                    defered.resolve(notebooks);
+                }, function (err) {
+                    defered.reject(err);
+                });
+
+                return defered.promise;
             },
             remove: function (path) {
                 client.remove(path, function (err) {
@@ -182,6 +226,7 @@ angular.module('myApp.services', [])
             all: function () {
                 var notebookString = window.localStorage['notebooks'];
                 if (notebookString) {
+                    console.log('read from local storage');
                     var notebooks = angular.fromJson(notebookString);
                     if (DropboxService.getDraftNotebook().notes.length > 0) {
                         notebooks.push(DropboxService.getDraftNotebook());
@@ -192,13 +237,17 @@ angular.module('myApp.services', [])
                 return [];
             },
             save: function (notebooks, skipDropbox) {
-                window.localStorage['notebooks'] = angular.toJson(notebooks);
                 if (!skipDropbox) {
-                    for (var i in notebooks) {
-                        if (notebooks[i].title !== '_draft') {
-                            DropboxService.writeNotebook(notebooks[i]);
-                        }
-                    }
+                    DropboxService.writeNotebooks(notebooks).then(function (notebooks) {
+                        console.log('save to local storage on Dropbox successful');
+                        window.localStorage['notebooks'] = angular.toJson(notebooks);
+                    }, function (err) {
+                        // TODO: Error Handling
+                        console.log(err)
+                    });
+                } else {
+                    console.log('save to local storage');
+                    window.localStorage['notebooks'] = angular.toJson(notebooks);
                 }
             },
             newNotebook: function (notebookTitle) {
