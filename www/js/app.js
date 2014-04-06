@@ -16,9 +16,7 @@ var myApp = angular.module('myApp', [
             // if not phonegap, use html5mode
             $locationProvider.html5Mode(true);
         }
-        $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
-        $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl1'});
-        $routeProvider.when('/uitest', {templateUrl: 'partials/uitest.html', controller: 'MyCtrl1'});
+
         $routeProvider.when('/', {templateUrl: 'notes.html', controller:'NoteCtrl'});
         $routeProvider.when('/noteEdit', {templateUrl: 'noteEdit.html', controller:'EditNoteCtrl'});
 
