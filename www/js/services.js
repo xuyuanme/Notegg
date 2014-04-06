@@ -7,7 +7,7 @@
 // In this case it is a simple value service.
 angular.module('myApp.services', [])
     .value('version', '0.1')
-    .factory('Utils', function ($location) {
+    .factory('Utils', function ($location, $rootScope) {
         var service = {
             Error: {WriteNoteFail: 1, Others: 999},
             goto: function (url) {
@@ -19,20 +19,22 @@ angular.module('myApp.services', [])
             warn: function (log) {
                 console.log(log);
             },
-            error: function (log) {
-                console.log(log);
+            error: function (err) {
+                console.log(err);
+                if (err.status === Dropbox.ApiError.INVALID_TOKEN ||
+                    err.status === Dropbox.ApiError.OAUTH_ERROR) {
+                    $rootScope.$broadcast('DropboxError', err);
+                }
+                this.toast(err);
+            },
+            toast: function (message) {
+                $rootScope.$broadcast('ShowToast', message);
             }
         };
         return service;
     })
     .factory('DropboxService', function ($q, $rootScope, Utils) {
 //        Utils.info('init dropbox client');
-        var errorHandling = function (err) {
-            if (err) {
-                Utils.info(err);
-                $rootScope.$broadcast('DropboxError', err);
-            }
-        };
         var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
         if (myApp.isPhone) {
             client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: true}));
@@ -66,7 +68,7 @@ angular.module('myApp.services', [])
                 var defered = $q.defer();
                 client.readFile(path, function (err, data, stat, range) {
                     if (err) {
-                        Utils.info('read note err: ' + err);
+                        Utils.error('read note err: ' + err);
                         defered.reject({status: err.status, data: path});
                     } else {
                         var title = path.replace(/.*\//, '').replace(/\.\w*$/, ''); // replace '/a.a/b.b/e.e.txt' to 'e.e'
@@ -87,7 +89,7 @@ angular.module('myApp.services', [])
 
                 client.readdir(path, function (err, d1, d2, files) {
                     if (err) {
-                        Utils.info('read notebook err: ' + err);
+                        Utils.error('read notebook err: ' + err);
                         defered.reject({status: err.status, data: path});
                     } else {
                         for (var i in files) {
@@ -118,7 +120,7 @@ angular.module('myApp.services', [])
 
                 client.readdir('/', function (err, d1, d2, folders) {
                     if (err) {
-                        Utils.info('read notebooks err: ' + err);
+                        Utils.error('read notebooks err: ' + err);
                         defered.reject({status: err.status, data: err});
                     } else {
                         for (var i in folders) {
@@ -209,12 +211,12 @@ angular.module('myApp.services', [])
             },
             remove: function (path) {
                 client.remove(path, function (err) {
-                    errorHandling(err);
+                    Utils.error(err);
                 });
             },
             mkdir: function (path) {
                 client.mkdir(path, function (err) {
-                    errorHandling(err);
+                    Utils.error(err);
                 });
             }
         };

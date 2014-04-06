@@ -3,6 +3,15 @@
 /* Controllers */
 
 angular.module('myApp.controllers', [])
+    .controller('ToastController', function ($scope, Utils) {
+        $scope.$on('ShowToast', function (event, message) {
+            if (message) {
+                Utils.info('show toast message: ' + message);
+                $scope.toast = {message: message};
+                showToast();
+            }
+        });
+    })
     .controller('DropboxCtrl', ['$scope', '$location', 'DropboxService', 'Utils', function ($scope, $location, DropboxService, Utils) {
 
         $scope.init = function () {
@@ -17,6 +26,10 @@ angular.module('myApp.controllers', [])
                 $scope.authDropbox(false);
             }
             $scope.$on('DropboxError', function (event, err) {
+                if (err.status === Dropbox.ApiError.INVALID_TOKEN) {
+                    Utils.info('reset dropbox client');
+                    DropboxService.reset();
+                }
                 $scope.resetUI();
                 $scope.$apply();
             });
@@ -85,32 +98,6 @@ angular.module('myApp.controllers', [])
                 }
             });
         };
-
-//        $scope.readNotes = function () {
-//            Utils.info('start read notes');
-//            // $scope.notes = DropboxService.readNotes();
-//            DropboxService.readNotes().then(function (result) {
-//                $scope.versionTag = result.stat.versionTag;
-//                $scope.notesContainer.notes = result.data;
-//                $scope.uiContainer.showWaitingBar = false;
-//                $scope.hide();
-//                $scope.$broadcast('scroll.refreshComplete');
-//                Utils.info('read notes done');
-//            }, function (err) {
-//                Utils.error('read notes promise get error: ' + err);
-//                if (err.status === Dropbox.ApiError.INVALID_TOKEN) {
-//                    Utils.info('reset dropbox client');
-//                    DropboxService.reset();
-//                    $scope.resetUI();
-//                } else if (err.status === Dropbox.ApiError.NOT_FOUND) {
-////                    $scope.writeNotes();
-//                } else if (err.status === Dropbox.ApiError.NETWORK_ERROR) {
-//
-//                } else {
-//                    $scope.resetUI();
-//                }
-//            });
-//        };
 
         $scope.resetUI = function () {
             Utils.info('reset ui');
@@ -253,10 +240,7 @@ angular.module('myApp.controllers', [])
         $scope.refreshNotebooks = function () {
             NotebookService.refreshNotebooks(function (err, notebooks) {
                 if (err) {
-                    Utils.info('ERROR: ' + err);
-                    // TODO show toast popup for every error message
-                    $scope.toast = {message: 'ERROR: ' + err};
-                    showToast();
+                    Utils.error('ERROR: ' + err);
                     $scope.$broadcast('scroll.refreshComplete');
                 } else {
                     $scope.notebooks = notebooks;

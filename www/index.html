@@ -57,6 +57,7 @@
 <body ng-app="myApp">
 
 <div ng-view ng-controller="DropboxCtrl"></div>
+<div id="toast" style="opacity: 0;" ng-controller="ToastController">{{toast.message}}</div>
 
 <script id="notes.html" type="text/ng-template">
     <side-menus>
@@ -83,7 +84,7 @@
                         {{note.title}}
                     </item>
                 </list>
-                <div id="toast" style="opacity: 0;">{{toast.message}}</div>
+
                 <refresher></refresher>
             </content>
         </pane>
