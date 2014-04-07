@@ -301,9 +301,9 @@ angular.module('myApp.services', [])
                 DropboxService.readNotebooks().then(function (notebooks) {
                     Utils.info('read notebooks done');
                     that.save(notebooks, true);
-                    fn(null, that.all());
+                    fn(that.all());
                 }, function (err) {
-                    fn(err);
+                    Utils.error(err);
                 });
             },
             getDraftNotebook: function () {
