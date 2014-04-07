@@ -166,6 +166,7 @@ angular.module('myApp.services', [])
                         if (notebook.notes[i].isChanged) {
                             promises.push(that.writeNote(dir, notebook.notes[i]).then(function (stat) {
                                 notebook.notes[i].versionTag = stat.versionTag;
+                                notebook.notes[i].isChanged = false;
                                 return notebook.notes[i];
                             }));
                         } else {
@@ -193,11 +194,9 @@ angular.module('myApp.services', [])
 
                 for (var i in notebooks) {
                     (function (i) {
-                        if (notebooks[i].title !== '_draft') {
-                            promises.push(that.writeNotebook(notebooks[i]).then(function (notebook) {
-                                return notebook
-                            }));
-                        }
+                        promises.push(that.writeNotebook(notebooks[i]).then(function (notebook) {
+                            return notebook
+                        }));
                     }(i));
                 }
 
@@ -233,9 +232,6 @@ angular.module('myApp.services', [])
                 if (notebookString) {
                     Utils.info('read from local storage');
                     var notebooks = angular.fromJson(notebookString);
-                    if (this.getDraftNotebook().notes.length > 0) {
-                        notebooks.push(this.getDraftNotebook());
-                    }
                     return notebooks;
                 }
                 return [];
@@ -249,13 +245,8 @@ angular.module('myApp.services', [])
                         Utils.info('save to local storage again on Dropbox successful, so versionTag is updated');
                         window.localStorage['notebooks'] = angular.toJson(notebooks);
                     }, function (err) {
-                        Utils.error('save notebooks error, code: ' + err.status);
-                        // TODO: Error Handling
-                        Utils.error('copy reject note ' + err.data.title + ' to _draft box');
-                        that.saveDraft(err.data);
-                        // TODO: verify and implement the logic here
-                        // TODO: offline edit support
-                        // TODO: delete draft unsuccessful
+                        Utils.info('save notebooks error, code: ' + err.status);
+                        Utils.error(err);
                     });
                 }
             },
@@ -298,25 +289,18 @@ angular.module('myApp.services', [])
             },
             refreshNotebooks: function (fn) {
                 var that = this;
-                DropboxService.readNotebooks().then(function (notebooks) {
-                    Utils.info('read notebooks done');
-                    that.save(notebooks, true);
-                    fn(that.all());
-                }, function (err) {
-                    Utils.error(err);
-                });
-            },
-            getDraftNotebook: function () {
-                var notebookString = window.localStorage['drafts_notebook'];
-                if (notebookString) {
-                    return angular.fromJson(notebookString);
-                }
-                return {title: '_draft', notes: []};
-            },
-            saveDraft: function (draft) {
-                var draftNotebook = this.getDraftNotebook();
-                draftNotebook.notes.push(draft);
-                window.localStorage['drafts_notebook'] = angular.toJson(draftNotebook);
+                // write before refresh to avoid lose unsaved data
+                DropboxService.writeNotebooks(this.all()).then(
+                    function () {
+                        DropboxService.readNotebooks().then(function (notebooks) {
+                            Utils.info('read notebooks done');
+                            that.save(notebooks, true);
+                            fn(that.all());
+                        })
+                    },
+                    function (err) {
+                        Utils.error(err);
+                    });
             }
         }
     });
