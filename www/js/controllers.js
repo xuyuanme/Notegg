@@ -238,10 +238,12 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.refreshNotebooks = function () {
-            NotebookService.refreshNotebooks(function (notebooks) {
-                $scope.notebooks = notebooks;
-                $scope.activeNotebook = $scope.notebooks[NotebookService.getLastActiveIndex()];
-                $scope.$apply();
+            NotebookService.refreshNotebooks(function (err, notebooks) {
+                if (!err && notebooks) {
+                    $scope.notebooks = notebooks;
+                    $scope.activeNotebook = $scope.notebooks[NotebookService.getLastActiveIndex()];
+                    $scope.$apply();
+                }
                 $scope.$broadcast('scroll.refreshComplete');
             });
         };

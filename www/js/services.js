@@ -290,15 +290,21 @@ angular.module('myApp.services', [])
             refreshNotebooks: function (fn) {
                 var that = this;
                 // write before refresh to avoid lose unsaved data
-                DropboxService.writeNotebooks(this.all()).then(
-                    function () {
-                        DropboxService.readNotebooks().then(function (notebooks) {
-                            Utils.info('read notebooks done');
-                            that.save(notebooks, true);
-                            fn(that.all());
-                        })
-                    },
-                    function (err) {
+                DropboxService.writeNotebooks(this.all())
+                    .then(function () {
+                        DropboxService.readNotebooks()
+                            .then(function (notebooks) {
+                                Utils.info('read notebooks done');
+                                that.save(notebooks, true);
+                                fn(null, that.all());
+                            })
+                            .catch(function (err) {
+                                fn(err);
+                                Utils.error(err);
+                            })
+                    })
+                    .catch(function (err) {
+                        fn(err);
                         Utils.error(err);
                     });
             }
