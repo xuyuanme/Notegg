@@ -110,6 +110,10 @@ angular.module('myApp.controllers', [])
                 $scope.refreshNotebooks();
             }, false);
 
+            document.addEventListener("deviceready", function () {
+                $scope.refreshNotebooks();
+            }, false);
+
             // Grab the last active, or the first notebook
             $scope.activeNotebook = $scope.notebooks[NotebookService.getLastActiveIndex()];
 
