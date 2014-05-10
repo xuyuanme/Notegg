@@ -111,7 +111,9 @@ angular.module('myApp.controllers', [])
             }, false);
 
             document.addEventListener("deviceready", function () {
-                $scope.refreshNotebooks();
+                if (DropboxService.isAuthenticated()) {
+                    $scope.refreshNotebooks();
+                }
             }, false);
 
             // Grab the last active, or the first notebook
