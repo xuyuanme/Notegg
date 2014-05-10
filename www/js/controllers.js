@@ -8,7 +8,7 @@ angular.module('myApp.controllers', [])
             if (message) {
                 Utils.info('show toast message: ' + message);
                 $scope.toast = {message: message};
-                showToast();
+//                showToast();
             }
         });
     })
@@ -22,7 +22,6 @@ angular.module('myApp.controllers', [])
                 DropboxService.reset();
                 $scope.resetUI();
             } else {
-                $scope.show();
                 $scope.authDropbox(false);
             }
             $scope.$on('DropboxError', function (event, err) {
@@ -35,39 +34,9 @@ angular.module('myApp.controllers', [])
             });
         };
 
-        // Trigger the loading indicator
-        $scope.show = function () {
-
-//            // Show the loading overlay and text
-//            $scope.loading = Loading.show({
-//
-//                // The text to display in the loading indicator
-//                content: 'Loading',
-//
-//                // The animation to use
-//                animation: 'fade-in',
-//
-//                // Will a dark overlay or backdrop cover the entire view
-//                showBackdrop: true,
-//
-//                // The maximum width of the loading indicator
-//                // Text will be wrapped if longer than maxWidth
-//                maxWidth: 200,
-//
-//                // The delay in showing the indicator
-//                showDelay: 500
-//            });
-        };
-
-        // Hide the loading indicator
-        $scope.hide = function () {
-//            $scope.loading.hide();
-        };
-
         $scope.authDropbox = function (interactive) {
 //            $scope.uiContainer.showSigninButton = false;
 //            $scope.uiContainer.showWaitingBar = true;
-            $scope.show();
 
             if (interactive === null || interactive === undefined) {
                 interactive = true;
@@ -103,7 +72,6 @@ angular.module('myApp.controllers', [])
             Utils.info('reset ui');
             $scope.uiContainer.showSigninButton = true;
             $scope.uiContainer.showWaitingBar = false;
-            $scope.hide();
             $scope.$broadcast('scroll.refreshComplete');
         };
 
@@ -114,7 +82,7 @@ angular.module('myApp.controllers', [])
         $scope.init();
     }])
 
-    .controller('NoteCtrl', function ($scope, $ionicModal, NotebookService, $location, DropboxService, Utils) {
+    .controller('NoteCtrl', function ($scope, $ionicModal, NotebookService, $location, DropboxService, Utils, $ionicLoading) {
         var createNotebook = function (notebookTitle) {
             $scope.notebooks = NotebookService.createNotebook(notebookTitle);
             $scope.selectNotebook($scope.notebooks.length - 1);
@@ -206,7 +174,7 @@ angular.module('myApp.controllers', [])
                 }
             } else {
                 navigator.notification.confirm(
-                        'Delete Notebook "' + $scope.notebooks[item].title + '"?', // message
+                    'Delete Notebook "' + $scope.notebooks[item].title + '"?', // message
                     function (buttonIndex) {
                         if (buttonIndex === 1) {
                             deleteNotebook(item);
@@ -238,12 +206,16 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.refreshNotebooks = function () {
+            $scope.loading = $ionicLoading.show({
+                content: 'Loading...'
+            });
             NotebookService.refreshNotebooks(function (err, notebooks) {
                 if (!err && notebooks) {
                     $scope.notebooks = notebooks;
                     $scope.activeNotebook = $scope.notebooks[NotebookService.getLastActiveIndex()];
                     $scope.$apply();
                 }
+                $scope.loading.hide();
                 $scope.$broadcast('scroll.refreshComplete');
             });
         };
