@@ -111,11 +111,11 @@ angular.module('myApp.controllers', [])
 //                $scope.refreshNotebooks();
 //            }, false);
 
-            document.addEventListener("deviceready", function () {
-                if (DropboxService.isAuthenticated()) {
-                    $scope.refreshNotebooks();
-                }
-            }, false);
+//            document.addEventListener("deviceready", function () {
+//                if (DropboxService.isAuthenticated()) {
+//                    $scope.refreshNotebooks();
+//                }
+//            }, false);
 
             // Grab the last active, or the first notebook
             $scope.activeNotebook = $scope.notebooks[NotebookService.getLastActiveIndex()];
