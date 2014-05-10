@@ -12,7 +12,7 @@ angular.module('myApp.controllers', [])
             }
         });
     })
-    .controller('DropboxCtrl', ['$scope', '$location', 'DropboxService', 'Utils', function ($scope, $location, DropboxService, Utils) {
+    .controller('DropboxCtrl', ['$scope', '$location', 'DropboxService', 'Utils', '$rootScope', function ($scope, $location, DropboxService, Utils, $rootScope) {
 
         $scope.init = function () {
             Utils.info('init MyCtrl');
@@ -58,8 +58,10 @@ angular.module('myApp.controllers', [])
                         if (myApp.isPhone) {
                             $scope.$apply();
                         }
-//                        $scope.readNotes();
-                        Utils.info('sent read notes request');
+                        if (interactive) {
+                            Utils.info('broadcast login success event');
+                            $rootScope.$broadcast('LoginSuccess');
+                        }
                     } else {
                         Utils.error('client not authenticated');
                         $scope.resetUI();
@@ -114,6 +116,10 @@ angular.module('myApp.controllers', [])
             if ($scope.notebooks.length === 0) {
                 createNotebook("Main");
             }
+
+            $scope.$on('LoginSuccess', function (event) {
+                $scope.refreshNotebooks();
+            });
         };
 
         // Called to create a new notebook
