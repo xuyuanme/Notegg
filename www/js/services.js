@@ -37,10 +37,18 @@ angular.module('myApp.services', [])
 //        Utils.info('init dropbox client');
         var client = new Dropbox.Client({ key: 'w7hk0g1c2pnqs8g' });
         if (myApp.isPhone) {
+            // PhoneGap app
             client.authDriver(new Dropbox.AuthDriver.Cordova({rememberUser: true}));
-        } else {
+        } else if (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase())) {
+            // Mobile Browser
             client.authDriver(new Dropbox.AuthDriver.Redirect({ rememberUser: true }));
-//            client.authDriver(new Dropbox.AuthDriver.Popup({ rememberUser: true, receiverUrl: document.location + 'auth_receiver.html' }));
+        } else if ((/chrome/i.test(navigator.userAgent.toLowerCase()))) {
+            // PC Chrome
+            // Use Dropbox Popup auth driver instead of Redirect auth driver. This will fix the AngularJS infinite loop when Dropbox auth page is redirect back.
+            client.authDriver(new Dropbox.AuthDriver.Popup({ rememberUser: true, receiverUrl: document.location + 'auth_receiver.html' }));
+        } else {
+            // Other PC browser
+            client.authDriver(new Dropbox.AuthDriver.Redirect({ rememberUser: true }));
         }
         // fake auth first to see if there's catched token
         client.authenticate({interactive: false});
